@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Azure Network Cheatsheet — cloud63.fr</title>
+    <style>
+        :root {
+            --bg: #0f1117;
+            --bg-card: #161b22;
+            --bg-card-hover: #1c2333;
+            --border: #30363d;
+            --text: #e6edf3;
+            --text-muted: #8b949e;
+            --azure-blue: #0078d4;
+            --azure-light: #3794ff;
+            --green: #3fb950;
+            --yellow: #d29922;
+            --red: #f85149;
+            --orange: #db6d28;
+            --purple: #a371f7;
+            --cyan: #39d2c0;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        a { color: var(--azure-light); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        /* Header */
+        .hero {
+            background: linear-gradient(135deg, #0a1628 0%, #0f2847 50%, #0a1628 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 3rem 2rem 2rem;
+            text-align: center;
+        }
+        .hero h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--azure-light), var(--cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+        .hero p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto 1.5rem;
+        }
+        .hero .badge {
+            display: inline-block;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 0.3rem 1rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Search */
+        .search-container {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(15, 17, 23, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            padding: 0.8rem 2rem;
+        }
+        .search-wrapper {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .search-input {
+            flex: 1;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.6rem 1rem 0.6rem 2.5rem;
+            color: var(--text);
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%238b949e' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85zm-5.44.856a5 5 0 1 1 0-10 5 5 0 0 1 0 10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: 0.8rem center;
+        }
+        .search-input:focus { border-color: var(--azure-blue); }
+        .search-input::placeholder { color: var(--text-muted); }
+        .result-count {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+
+        /* Nav */
+        .nav {
+            max-width: 1400px;
+            margin: 1.5rem auto 0;
+            padding: 0 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .nav a {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.4rem 0.9rem;
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            transition: all 0.2s;
+        }
+        .nav a:hover {
+            color: var(--azure-light);
+            border-color: var(--azure-blue);
+            background: var(--bg-card-hover);
+            text-decoration: none;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Section */
+        .section { margin-bottom: 3rem; }
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            margin-bottom: 1.2rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .section-icon { font-size: 1.5rem; }
+        .section-header h2 { font-size: 1.4rem; font-weight: 600; }
+        .section-header .section-desc {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-left: auto;
+        }
+
+        /* Table */
+        .table-wrap {
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+        }
+        table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+        thead th {
+            background: var(--bg-card);
+            padding: 0.7rem 0.9rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
+        }
+        tbody tr {
+            border-bottom: 1px solid var(--border);
+            transition: background 0.15s;
+        }
+        tbody tr:last-child { border-bottom: none; }
+        tbody tr:hover { background: var(--bg-card-hover); }
+        tbody td { padding: 0.6rem 0.9rem; vertical-align: top; }
+        tbody tr.hidden { display: none; }
+
+        /* Tags */
+        .tag {
+            display: inline-block;
+            padding: 0.15rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        .tag-yes { background: rgba(63,185,80,0.15); color: var(--green); }
+        .tag-no { background: rgba(248,81,73,0.15); color: var(--red); }
+        .tag-partial { background: rgba(210,153,34,0.15); color: var(--yellow); }
+        .tag-info { background: rgba(55,148,255,0.15); color: var(--azure-light); }
+        .tag-purple { background: rgba(163,113,247,0.15); color: var(--purple); }
+        .tag-orange { background: rgba(219,109,40,0.15); color: var(--orange); }
+        .tag-cyan { background: rgba(57,210,192,0.15); color: var(--cyan); }
+
+        /* Tip cards */
+        .tips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1rem;
+        }
+        .tip-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.2rem;
+            transition: border-color 0.2s;
+        }
+        .tip-card:hover { border-color: var(--azure-blue); }
+        .tip-card h4 {
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .tip-card p, .tip-card ul {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+        .tip-card code {
+            background: rgba(55,148,255,0.1);
+            color: var(--azure-light);
+            padding: 0.1rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+        .tip-card .doc-link {
+            display: inline-block;
+            margin-top: 0.5rem;
+            font-size: 0.78rem;
+        }
+
+        /* Callout */
+        .callout {
+            border-radius: 8px;
+            padding: 1rem 1.2rem;
+            margin-bottom: 1rem;
+            font-size: 0.88rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.7rem;
+        }
+        .callout-warn {
+            background: rgba(210,153,34,0.1);
+            border: 1px solid rgba(210,153,34,0.3);
+        }
+        .callout-info {
+            background: rgba(55,148,255,0.08);
+            border: 1px solid rgba(55,148,255,0.25);
+        }
+        .callout-icon { font-size: 1.2rem; flex-shrink: 0; }
+
+        /* Hub diagram */
+        .hub-diagram {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 0.8rem;
+            margin: 1rem 0;
+        }
+        .hub-subnet {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.8rem 1rem;
+            border-left: 3px solid var(--azure-blue);
+        }
+        .hub-subnet .name { font-weight: 600; font-size: 0.85rem; margin-bottom: 0.3rem; }
+        .hub-subnet .cidr { color: var(--azure-light); font-family: monospace; font-size: 0.85rem; }
+        .hub-subnet .usable { color: var(--text-muted); font-size: 0.75rem; }
+
+        /* Doc link in tables */
+        .doc { font-size: 0.75rem; }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 1.8rem; }
+            .container { padding: 1rem; }
+            .tips-grid { grid-template-columns: 1fr; }
+            .nav { gap: 0.3rem; }
+            .nav a { font-size: 0.75rem; padding: 0.3rem 0.6rem; }
+            .section-header .section-desc { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="hero">
+    <h1>☁️ Azure Network Cheatsheet</h1>
+    <p>All Azure networking requirements, best practices, limits and SKU comparisons in one place. Stop digging through hundreds of Microsoft docs pages.</p>
+    <span class="badge">Last updated: March 2026</span>
+</div>
+
+<div class="search-container">
+    <div class="search-wrapper">
+        <input type="text" class="search-input" id="searchInput" placeholder="Search for a service, feature, SKU, limit..." autofocus>
+        <span class="result-count" id="resultCount"></span>
+    </div>
+</div>
+
+<nav class="nav" id="nav">
+    <a href="#subnet-sizing">📐 Subnet Sizing</a>
+    <a href="#hub-layout">🏗️ Hub Layout</a>
+    <a href="#delegation">📋 Delegations</a>
+    <a href="#private-endpoint">🔒 Private Endpoint</a>
+    <a href="#nsg-udr">🛡️ NSG & UDR</a>
+    <a href="#limits">📊 Limits & Quotas</a>
+    <a href="#vpn-gateway">🔗 VPN Gateway SKU</a>
+    <a href="#firewall">🔥 Azure Firewall SKU</a>
+    <a href="#load-balancer">⚖️ Load Balancer</a>
+    <a href="#dns">🌐 DNS</a>
+    <a href="#best-practices">💡 Best Practices</a>
+</nav>
+
+<div class="container">
+
+    <!-- ==================== SUBNET SIZING ==================== -->
+    <section class="section" id="subnet-sizing">
+        <div class="section-header">
+            <span class="section-icon">📐</span>
+            <h2>Subnet Sizing by Service</h2>
+            <span class="section-desc">Minimum subnet size required for each Azure service</span>
+        </div>
+
+        <div class="callout callout-warn">
+            <span class="callout-icon">⚠️</span>
+            <div>Azure reserves <strong>5 IPs per subnet</strong> (.0, .1, .2, .3 and last). A /28 = 16 IPs, only <strong>11 usable</strong>. A /26 = 64 IPs → <strong>59 usable</strong>. Always plan larger since <strong>subnets cannot be resized</strong> once resources are deployed.
+            <br><a class="doc" href="https://learn.microsoft.com/en-us/azure/virtual-network/virtual-networks-faq#are-there-any-restrictions-on-using-ip-addresses-within-these-subnets" target="_blank">📄 Docs: Reserved IPs</a></div>
+        </div>
+
+        <div class="table-wrap">
+            <table id="subnetTable">
+                <thead>
+                    <tr>
+                        <th>Service</th>
+                        <th>Subnet Name</th>
+                        <th>Min CIDR</th>
+                        <th>Usable IPs</th>
+                        <th>Recommended</th>
+                        <th>Notes</th>
+                        <th>Docs</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Azure VMware Solution</td><td>—</td><td><span class="tag tag-orange">/22</span></td><td>1019</td><td>/22</td><td>For AVS clusters</td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/azure-vmware/plan-private-cloud-deployment#ip-address-segment-for-azure-vmware-solution-platform" target="_blank">📄</a></td></tr>
+                    <tr><td>App Service Environment v3</td><td>—</td><td><span class="tag tag-orange">/24</span></td><td>251</td><td>/24</td><td>Delegation required. Isolated PaaS hosting</td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/app-service/environment/networking" target="_blank">📄</a></td></tr>
+                    <tr><td>Azure Kubernetes Service (CNI)</td><td>—</td><td><span class="tag tag-orange">/24</span></td><td>251</td><td>/21 to /16</td><td>1 IP per pod + 1 IP per node. Plan for scaling</td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/aks/azure-cni-overview#plan-ip-addressing-for-your-cluster" target="_blank">📄</a></td></tr>
+                    <tr><td>Azure Firewall</td><td><code>AzureFirewallSubnet</code></td><td><span class="tag tag-info">/26</span></td><td>59</td><td>/26</td><td>Name mandatory. One per VNet</td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/firewall/firewall-faq#why-does-azure-firewall-need-a--26-subnet-size" target="_blank">📄</a></td></tr>
+                    <tr><td>Azure Firewall Management</td><td><code>AzureFirewallManagementSubnet</code></td><td><span class="tag tag-info">/26</span></td><td>59</td><td>/26</td><td>Required for forced tunneling</td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/firewall/forced-tunneling" target="_blank">📄</a></td></tr>
+                    <tr><td>Azure Bastion</td><td><code>AzureBastionSubnet</code></td><td><span class="tag tag-info">/26</span></td><td>59</td><td>/26</td><td>Name mandatory. Secure RDP/SSH access</td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/bastion/configuration-settings#subnet" target="_blank">📄</a></td></tr>
+                    <tr><td>Azure Databricks</td><td>public + private</td><td><span class="tag tag-info">/26</span> × 2</td><td>59 × 2</td><td>/26 × 2</td><td>Two subnets required for VNet injection</td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/databricks/administration-guide/cloud-configurations/azure/vnet-inject#subnet-sizes" target="_blank">📄</a></td></tr>
+                    <tr><td>VPN Gateway</td><td><code>GatewaySubnet</code></td><td><span class="tag tag-purple">/27</span></td><td>27</td><td>/27</td><td>Name mandatory. No NSG. Shared with ExpressRoute GW</td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/vpn-gateway/vpn-gateway-about-vpn-gateway-settings#gwsub" target="_blank">📄</a></td></tr>
+                    <tr><td>ExpressRoute Gateway</td><td><code>GatewaySubnet</code></td><td><span class="tag tag-purple">/27</span></td><td>27</td><td>/27</td><td>Same subnet as VPN Gateway</td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/expressroute/expressroute-about-virtual-network-gateways#gwsub" target="_blank">📄</a></td></tr>
+                    <tr><td>Azure Route Server</td><td><code>RouteServerSubnet</code></td><td><span class="tag tag-purple">/27</span></td><td>27</td><td>/27</td><td>Name mandatory. BGP route exchange</td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/route-server/overview#how-does-it-work" target="_blank">📄</a></td></tr>
+                    <tr><td>SQL Managed Instance</td><td>—</td><td><span class="tag tag-purple">/27</span></td><td>27</td><td>/26</td><td>Delegation required. Dedicated subnet</td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/azure-sql/managed-instance/vnet-subnet-determine-size" target="_blank">📄</a></td></tr>
+                    <tr><td>Azure Cache for Redis (Premium)</td><td>—</td><td><span class="tag tag-purple">/27</span></td><td>27</td><td>/27</td><td>2 IPs per shard + 1 LB</td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/azure-cache-for-redis/cache-how-to-premium-vnet" target="_blank">📄</a></td></tr>
+                    <tr><td>API Management (VNet)</td><td>—</td><td><span class="tag tag-purple">/27</span></td><td>27</td><td>/27</td><td>/29 possible for lightweight (stv2)</td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/api-management/virtual-network-concepts#subnet-size" target="_blank">📄</a></td></tr>
+                    <tr><td>Application Gateway</td><td>—</td><td><span class="tag tag-cyan">/28</span></td><td>11</td><td>/27 or /26</td><td>One AppGW per subnet. Plan for autoscaling</td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/application-gateway/configuration-infrastructure#size-of-the-subnet" target="_blank">📄</a></td></tr>
+                    <tr><td>Azure NetApp Files</td><td>—</td><td><span class="tag tag-cyan">/28</span></td><td>11</td><td>/28</td><td>Delegation required (Microsoft.NetApp/volumes)</td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/azure-netapp-files/azure-netapp-files-delegate-subnet" target="_blank">📄</a></td></tr>
+                    <tr><td>Azure Spring Apps</td><td>—</td><td><span class="tag tag-cyan">/28</span></td><td>11</td><td>/26</td><td>Two subnets: service runtime + apps</td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/spring-apps/how-to-deploy-in-azure-virtual-network#virtual-network-requirements" target="_blank">📄</a></td></tr>
+                    <tr><td>Entra Domain Services</td><td>—</td><td><span class="tag tag-cyan">/28</span></td><td>11</td><td>/28</td><td>Managed AD in Azure</td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/entra/identity/domain-services/tutorial-create-instance#create-a-virtual-network" target="_blank">📄</a></td></tr>
+                    <tr><td>Azure Dedicated HSM</td><td>—</td><td><span class="tag tag-cyan">/28</span></td><td>11</td><td>/28</td><td>Hardware Security Modules</td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/dedicated-hsm/networking" target="_blank">📄</a></td></tr>
+                    <tr><td>Private DNS Resolver (inbound)</td><td>—</td><td><span class="tag tag-cyan">/28</span></td><td>11</td><td>/28</td><td>Delegation required</td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/dns/dns-private-resolver-overview#subnet-restrictions" target="_blank">📄</a></td></tr>
+                    <tr><td>Private DNS Resolver (outbound)</td><td>—</td><td><span class="tag tag-cyan">/28</span></td><td>11</td><td>/28</td><td>Delegation required</td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/dns/dns-private-resolver-overview#subnet-restrictions" target="_blank">📄</a></td></tr>
+                    <tr><td>Azure Container Instances</td><td>—</td><td><span class="tag tag-yes">/29</span></td><td>3</td><td>/27</td><td>Delegation required for container groups</td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/container-instances/container-instances-vnet" target="_blank">📄</a></td></tr>
+                    <tr><td>NAT Gateway</td><td>—</td><td><span class="tag tag-yes">/29</span></td><td>3</td><td>—</td><td>Attaches to an existing subnet, no dedicated subnet needed</td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/nat-gateway/nat-overview" target="_blank">📄</a></td></tr>
+                    <tr><td>Private Endpoint</td><td>—</td><td><span class="tag tag-yes">/29</span></td><td>3</td><td>/27</td><td>1 IP per Private Endpoint. Plan based on PE count</td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/private-link/private-endpoint-overview" target="_blank">📄</a></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- ==================== HUB LAYOUT ==================== -->
+    <section class="section" id="hub-layout">
+        <div class="section-header">
+            <span class="section-icon">🏗️</span>
+            <h2>Hub Subnet Layout — Best Practice</h2>
+            <span class="section-desc">Reference architecture for a Hub VNet (/20 recommended)</span>
+        </div>
+
+        <div class="callout callout-info">
+            <span class="callout-icon">💡</span>
+            <div>A Hub VNet of <strong>/20</strong> (4,096 IPs) provides enough room for all shared services. Each Spoke VNet should be <strong>/22</strong> or <strong>/24</strong> depending on workload.
+            <br><a class="doc" href="https://learn.microsoft.com/en-us/azure/architecture/networking/architecture/hub-spoke" target="_blank">📄 Docs: Hub-spoke topology</a>
+            · <a class="doc" href="https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/plan-for-ip-addressing" target="_blank">📄 Docs: Plan IP addressing</a></div>
+        </div>
+
+        <div class="hub-diagram">
+            <div class="hub-subnet" style="border-left-color: var(--azure-blue)">
+                <div class="name">🔗 GatewaySubnet</div>
+                <div class="cidr">/27</div>
+                <div class="usable">27 IPs — VPN + ExpressRoute GW</div>
+            </div>
+            <div class="hub-subnet" style="border-left-color: var(--red)">
+                <div class="name">🔥 AzureFirewallSubnet</div>
+                <div class="cidr">/26</div>
+                <div class="usable">59 IPs — Centralized firewall</div>
+            </div>
+            <div class="hub-subnet" style="border-left-color: var(--orange)">
+                <div class="name">🔥 AzureFWMgmtSubnet</div>
+                <div class="cidr">/26</div>
+                <div class="usable">59 IPs — If forced tunneling</div>
+            </div>
+            <div class="hub-subnet" style="border-left-color: var(--green)">
+                <div class="name">🖥️ AzureBastionSubnet</div>
+                <div class="cidr">/26</div>
+                <div class="usable">59 IPs — Secure RDP/SSH access</div>
+            </div>
+            <div class="hub-subnet" style="border-left-color: var(--purple)">
+                <div class="name">🔄 RouteServerSubnet</div>
+                <div class="cidr">/27</div>
+                <div class="usable">27 IPs — BGP route exchange</div>
+            </div>
+            <div class="hub-subnet" style="border-left-color: var(--cyan)">
+                <div class="name">🌐 DNS Resolver Inbound</div>
+                <div class="cidr">/28</div>
+                <div class="usable">11 IPs — Inbound DNS resolution</div>
+            </div>
+            <div class="hub-subnet" style="border-left-color: var(--cyan)">
+                <div class="name">🌐 DNS Resolver Outbound</div>
+                <div class="cidr">/28</div>
+                <div class="usable">11 IPs — Outbound DNS resolution</div>
+            </div>
+            <div class="hub-subnet" style="border-left-color: var(--yellow)">
+                <div class="name">🔒 Private Endpoints</div>
+                <div class="cidr">/26 to /24</div>
+                <div class="usable">59-251 IPs — Centralize PEs here</div>
+            </div>
+            <div class="hub-subnet" style="border-left-color: var(--text-muted)">
+                <div class="name">🛠️ Management / Shared</div>
+                <div class="cidr">/26</div>
+                <div class="usable">59 IPs — Jump boxes, monitoring</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== DELEGATION ==================== -->
+    <section class="section" id="delegation">
+        <div class="section-header">
+            <span class="section-icon">📋</span>
+            <h2>Subnet Delegation</h2>
+            <span class="section-desc">Services that require a delegated subnet</span>
+        </div>
+
+        <div class="callout callout-warn">
+            <span class="callout-icon">⚠️</span>
+            <div>A delegated subnet is <strong>exclusive</strong> to its designated service — no other resources can be deployed in it.<br>
+            List available delegations: <code>az network vnet subnet list-available-delegations --location westeurope</code>
+            <br><a class="doc" href="https://learn.microsoft.com/en-us/azure/virtual-network/subnet-delegation-overview" target="_blank">📄 Docs: Subnet delegation overview</a></div>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Service</th>
+                        <th>Delegation Name</th>
+                        <th>Shared</th>
+                        <th>Docs</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>App Service / Functions (VNet Integration)</td><td><code>Microsoft.Web/serverFarms</code></td><td><span class="tag tag-no">No</span></td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/app-service/overview-vnet-integration" target="_blank">📄</a></td></tr>
+                    <tr><td>App Service Environment v3</td><td><code>Microsoft.Web/hostingEnvironments</code></td><td><span class="tag tag-no">No</span></td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/app-service/environment/networking" target="_blank">📄</a></td></tr>
+                    <tr><td>SQL Managed Instance</td><td><code>Microsoft.Sql/managedInstances</code></td><td><span class="tag tag-no">No</span></td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/azure-sql/managed-instance/connectivity-architecture-overview" target="_blank">📄</a></td></tr>
+                    <tr><td>Azure Container Instances</td><td><code>Microsoft.ContainerInstance/containerGroups</code></td><td><span class="tag tag-no">No</span></td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/container-instances/container-instances-vnet" target="_blank">📄</a></td></tr>
+                    <tr><td>Azure NetApp Files</td><td><code>Microsoft.NetApp/volumes</code></td><td><span class="tag tag-no">No</span></td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/azure-netapp-files/azure-netapp-files-delegate-subnet" target="_blank">📄</a></td></tr>
+                    <tr><td>Azure Databricks</td><td><code>Microsoft.Databricks/workspaces</code></td><td><span class="tag tag-no">No</span></td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/databricks/administration-guide/cloud-configurations/azure/vnet-inject" target="_blank">📄</a></td></tr>
+                    <tr><td>API Management</td><td><code>Microsoft.ApiManagement/service</code></td><td><span class="tag tag-no">No</span></td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/api-management/virtual-network-concepts" target="_blank">📄</a></td></tr>
+                    <tr><td>Azure Kubernetes Service</td><td><code>Microsoft.ContainerService/managedClusters</code></td><td><span class="tag tag-no">No</span></td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/aks/azure-cni-overview" target="_blank">📄</a></td></tr>
+                    <tr><td>Container Apps Environment</td><td><code>Microsoft.App/environments</code></td><td><span class="tag tag-no">No</span></td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/container-apps/vnet-custom" target="_blank">📄</a></td></tr>
+                    <tr><td>Azure Cosmos DB (dedicated)</td><td><code>Microsoft.AzureCosmosDB/clusters</code></td><td><span class="tag tag-no">No</span></td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/cosmos-db/how-to-configure-vnet-service-endpoint" target="_blank">📄</a></td></tr>
+                    <tr><td>Azure Batch</td><td><code>Microsoft.Batch/batchAccounts</code></td><td><span class="tag tag-no">No</span></td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/batch/batch-virtual-network" target="_blank">📄</a></td></tr>
+                    <tr><td>Private DNS Resolver (inbound)</td><td><code>Microsoft.Network/dnsResolvers</code></td><td><span class="tag tag-no">No</span></td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/dns/dns-private-resolver-overview" target="_blank">📄</a></td></tr>
+                    <tr><td>Private DNS Resolver (outbound)</td><td><code>Microsoft.Network/dnsResolvers</code></td><td><span class="tag tag-no">No</span></td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/dns/dns-private-resolver-overview" target="_blank">📄</a></td></tr>
+                    <tr><td>Azure Machine Learning</td><td><code>Microsoft.MachineLearningServices/workspaces</code></td><td><span class="tag tag-no">No</span></td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/machine-learning/how-to-managed-network" target="_blank">📄</a></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- ==================== PRIVATE ENDPOINT vs SERVICE ENDPOINT ==================== -->
+    <section class="section" id="private-endpoint">
+        <div class="section-header">
+            <span class="section-icon">🔒</span>
+            <h2>Private Endpoint vs Service Endpoint</h2>
+            <span class="section-desc">When to use which</span>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Criteria</th>
+                        <th>Service Endpoint</th>
+                        <th>Private Endpoint</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>IP Type</strong></td><td>Public IP of the service</td><td>Private IP in your VNet</td></tr>
+                    <tr><td><strong>Granularity</strong></td><td>Subnet level</td><td>Resource level (NIC)</td></tr>
+                    <tr><td><strong>Isolation</strong></td><td>Partial (need firewall rules too)</td><td>Complete — no internet exposure</td></tr>
+                    <tr><td><strong>DNS</strong></td><td>Public DNS</td><td>Private DNS Zone required</td></tr>
+                    <tr><td><strong>On-Premises Access</strong></td><td><span class="tag tag-no">No</span></td><td><span class="tag tag-yes">Yes</span> (via VPN/ExpressRoute)</td></tr>
+                    <tr><td><strong>Cross-Region</strong></td><td><span class="tag tag-no">No</span></td><td><span class="tag tag-yes">Yes</span></td></tr>
+                    <tr><td><strong>Cost</strong></td><td><span class="tag tag-yes">Free</span></td><td><span class="tag tag-orange">~$7.30/month + data</span></td></tr>
+                    <tr><td><strong>Complexity</strong></td><td>Simple</td><td>Medium (DNS, NSG config)</td></tr>
+                    <tr><td><strong>Recommendation</strong></td><td>Dev/Test, non-critical workloads</td><td><strong>Production, compliance, hybrid</strong></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div style="text-align: right; margin: -1rem 0 1rem;">
+            <a class="doc" href="https://learn.microsoft.com/en-us/azure/private-link/private-endpoint-overview" target="_blank">📄 Private Endpoint overview</a>
+            · <a class="doc" href="https://learn.microsoft.com/en-us/azure/virtual-network/virtual-network-service-endpoints-overview" target="_blank">📄 Service Endpoint overview</a>
+        </div>
+
+        <h3 style="margin: 1.5rem 0 1rem; font-size: 1.1rem;">Per-Service Support</h3>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Azure Service</th>
+                        <th>Service Endpoint</th>
+                        <th>Private Endpoint</th>
+                        <th>Private DNS Zone</th>
+                        <th>Docs</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Azure Storage (Blob/File/Queue/Table)</td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td><td><code>privatelink.blob.core.windows.net</code></td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/storage/common/storage-private-endpoints" target="_blank">📄</a></td></tr>
+                    <tr><td>Azure SQL Database</td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td><td><code>privatelink.database.windows.net</code></td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/azure-sql/database/private-endpoint-overview" target="_blank">📄</a></td></tr>
+                    <tr><td>Azure Cosmos DB</td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td><td><code>privatelink.documents.azure.com</code></td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/cosmos-db/how-to-configure-private-endpoints" target="_blank">📄</a></td></tr>
+                    <tr><td>Azure Key Vault</td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td><td><code>privatelink.vaultcore.azure.net</code></td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/key-vault/general/private-link-service" target="_blank">📄</a></td></tr>
+                    <tr><td>Azure Container Registry</td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td><td><code>privatelink.azurecr.io</code></td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/container-registry/container-registry-private-link" target="_blank">📄</a></td></tr>
+                    <tr><td>Azure Event Hubs</td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td><td><code>privatelink.servicebus.windows.net</code></td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/event-hubs/private-link-service" target="_blank">📄</a></td></tr>
+                    <tr><td>Azure Service Bus</td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td><td><code>privatelink.servicebus.windows.net</code></td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/service-bus-messaging/private-link-service" target="_blank">📄</a></td></tr>
+                    <tr><td>Azure App Service</td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td><td><code>privatelink.azurewebsites.net</code></td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/app-service/networking/private-endpoint" target="_blank">📄</a></td></tr>
+                    <tr><td>Azure Database for PostgreSQL</td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td><td><code>privatelink.postgres.database.azure.com</code></td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/postgresql/flexible-server/concepts-networking-private-link" target="_blank">📄</a></td></tr>
+                    <tr><td>Azure Database for MySQL</td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td><td><code>privatelink.mysql.database.azure.com</code></td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/mysql/flexible-server/concepts-networking-private-link" target="_blank">📄</a></td></tr>
+                    <tr><td>Azure Synapse Analytics</td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td><td><code>privatelink.sql.azuresynapse.net</code></td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/synapse-analytics/security/synapse-workspace-managed-private-endpoints" target="_blank">📄</a></td></tr>
+                    <tr><td>Azure Monitor (Log Analytics)</td><td><span class="tag tag-no">✗</span></td><td><span class="tag tag-yes">✓</span></td><td><code>privatelink.monitor.azure.com</code></td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/azure-monitor/logs/private-link-security" target="_blank">📄</a></td></tr>
+                    <tr><td>Azure Machine Learning</td><td><span class="tag tag-no">✗</span></td><td><span class="tag tag-yes">✓</span></td><td><code>privatelink.api.azureml.ms</code></td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/machine-learning/how-to-configure-private-link" target="_blank">📄</a></td></tr>
+                    <tr><td>Azure Data Factory</td><td><span class="tag tag-no">✗</span></td><td><span class="tag tag-yes">✓</span></td><td><code>privatelink.datafactory.azure.net</code></td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/data-factory/data-factory-private-link" target="_blank">📄</a></td></tr>
+                    <tr><td>Azure OpenAI / Cognitive Services</td><td><span class="tag tag-no">✗</span></td><td><span class="tag tag-yes">✓</span></td><td><code>privatelink.cognitiveservices.azure.com</code></td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/ai-services/cognitive-services-virtual-networks#use-private-endpoints" target="_blank">📄</a></td></tr>
+                    <tr><td>Azure Backup</td><td><span class="tag tag-no">✗</span></td><td><span class="tag tag-yes">✓</span></td><td><code>privatelink.{region}.backup.windowsazure.com</code></td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/backup/private-endpoints" target="_blank">📄</a></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div style="text-align: right; margin-top: -1rem;">
+            <a class="doc" href="https://learn.microsoft.com/en-us/azure/private-link/availability" target="_blank">📄 Full list: Private Link availability by service</a>
+        </div>
+    </section>
+
+    <!-- ==================== NSG & UDR ==================== -->
+    <section class="section" id="nsg-udr">
+        <div class="section-header">
+            <span class="section-icon">🛡️</span>
+            <h2>NSG & UDR Compatibility by Service</h2>
+            <span class="section-desc">Which services support NSGs and custom routes</span>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Service / Subnet</th>
+                        <th>NSG</th>
+                        <th>UDR</th>
+                        <th>Notes</th>
+                        <th>Docs</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>GatewaySubnet</code></td><td><span class="tag tag-no">✗ Forbidden</span></td><td><span class="tag tag-partial">⚠ Limited</span></td><td>No NSG. UDR without 0.0.0.0/0 route to NVA</td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/vpn-gateway/vpn-gateway-about-vpn-gateway-settings#gwsub" target="_blank">📄</a></td></tr>
+                    <tr><td><code>AzureFirewallSubnet</code></td><td><span class="tag tag-no">✗ Forbidden</span></td><td><span class="tag tag-yes">✓</span></td><td>UDR only for management (forced tunneling)</td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/firewall/firewall-faq#can-i-configure-nsgs-on-the-azurefirewallsubnet" target="_blank">📄</a></td></tr>
+                    <tr><td><code>AzureBastionSubnet</code></td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td><td>NSG with specific rules required (see docs)</td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/bastion/bastion-nsg" target="_blank">📄</a></td></tr>
+                    <tr><td><code>RouteServerSubnet</code></td><td><span class="tag tag-no">✗ Forbidden</span></td><td><span class="tag tag-no">✗ Forbidden</span></td><td>No customization allowed</td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/route-server/overview" target="_blank">📄</a></td></tr>
+                    <tr><td>Application Gateway</td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-partial">⚠ Limited</span></td><td>NSG: allow GatewayManager ports. No UDR to 0.0.0.0/0</td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/application-gateway/configuration-infrastructure#network-security-groups" target="_blank">📄</a></td></tr>
+                    <tr><td>API Management</td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td><td>NSG required with specific rules (ports 3443, etc.)</td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/api-management/virtual-network-concepts#force-tunnel-traffic" target="_blank">📄</a></td></tr>
+                    <tr><td>AKS (Azure CNI)</td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td><td>UDR to force egress traffic through a firewall</td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/aks/limit-egress-traffic" target="_blank">📄</a></td></tr>
+                    <tr><td>SQL Managed Instance</td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td><td>NSG auto-managed by the service. Don't remove the rules</td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/azure-sql/managed-instance/connectivity-architecture-overview" target="_blank">📄</a></td></tr>
+                    <tr><td>Private Endpoints</td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td><td>NSG and UDR supported since 2023</td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/private-link/disable-private-endpoint-network-policy" target="_blank">📄</a></td></tr>
+                    <tr><td>App Service (VNet Integration)</td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td><td>Outbound traffic from the app goes through the subnet</td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/app-service/overview-vnet-integration" target="_blank">📄</a></td></tr>
+                    <tr><td>Azure NetApp Files</td><td><span class="tag tag-no">✗ Ignored</span></td><td><span class="tag tag-no">✗ Ignored</span></td><td>NSG and UDR are applied but ignored by ANF</td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/azure-netapp-files/azure-netapp-files-network-topologies" target="_blank">📄</a></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- ==================== LIMITS ==================== -->
+    <section class="section" id="limits">
+        <div class="section-header">
+            <span class="section-icon">📊</span>
+            <h2>Azure Network Limits & Quotas</h2>
+            <span class="section-desc">The ceilings you need to know before hitting them in production</span>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Resource</th>
+                        <th>Default Limit</th>
+                        <th>Max Limit</th>
+                        <th>Scope</th>
+                        <th>Docs</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>VNets per subscription</td><td>1,000</td><td>1,000</td><td>Per region</td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/azure-subscription-service-limits#networking-limits" target="_blank">📄</a></td></tr>
+                    <tr><td>Subnets per VNet</td><td>3,000</td><td>3,000</td><td>Per VNet</td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/azure-subscription-service-limits#networking-limits" target="_blank">📄</a></td></tr>
+                    <tr><td>Peerings per VNet</td><td>500</td><td>1,000 (with AVNM)</td><td>Per VNet</td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/virtual-network/virtual-network-peering-overview" target="_blank">📄</a></td></tr>
+                    <tr><td>Private IPs per VNet</td><td>65,536</td><td>65,536</td><td>Per VNet</td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/azure-subscription-service-limits#networking-limits" target="_blank">📄</a></td></tr>
+                    <tr><td>Public IPs (Standard) per sub</td><td>1,000</td><td>On request</td><td>Per region</td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/azure-subscription-service-limits#publicip-standard" target="_blank">📄</a></td></tr>
+                    <tr><td>NSGs per subscription</td><td>5,000</td><td>5,000</td><td>Per region</td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/azure-subscription-service-limits#networking-limits" target="_blank">📄</a></td></tr>
+                    <tr><td>Rules per NSG</td><td>1,000</td><td>1,000</td><td>Inbound + outbound combined</td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/virtual-network/network-security-groups-overview#azure-platform-considerations" target="_blank">📄</a></td></tr>
+                    <tr><td>Routes per Route Table</td><td>400</td><td>400</td><td>Per table</td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/azure-subscription-service-limits#networking-limits" target="_blank">📄</a></td></tr>
+                    <tr><td>Route Tables per subscription</td><td>200</td><td>200</td><td>Per region</td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/azure-subscription-service-limits#networking-limits" target="_blank">📄</a></td></tr>
+                    <tr><td>BGP routes per gateway</td><td>1,000</td><td>1,000</td><td>Per BGP peer</td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/route-server/route-server-faq#how-many-routes-does-azure-route-server-support" target="_blank">📄</a></td></tr>
+                    <tr><td>Private Endpoints per subscription</td><td>1,000</td><td>On request</td><td>Per region</td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/azure-subscription-service-limits#private-link-limits" target="_blank">📄</a></td></tr>
+                    <tr><td>Private DNS Zones per sub</td><td>25,000</td><td>25,000</td><td>Per subscription</td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/dns/dns-private-zones-overview" target="_blank">📄</a></td></tr>
+                    <tr><td>VNet Links per Private DNS Zone</td><td>1,000</td><td>1,000</td><td>Per zone</td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/dns/dns-private-zones-overview" target="_blank">📄</a></td></tr>
+                    <tr><td>DNS records per Private DNS Zone</td><td>25,000</td><td>25,000</td><td>Per zone</td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/dns/dns-private-zones-overview" target="_blank">📄</a></td></tr>
+                    <tr><td>NICs per VM</td><td>Depends on SKU</td><td>8 (large VMs)</td><td>Per VM</td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/virtual-network/virtual-network-network-interface-vm" target="_blank">📄</a></td></tr>
+                    <tr><td>NAT Gateway — concurrent flows</td><td>50,000</td><td>50,000</td><td>Per public IP</td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/nat-gateway/nat-gateway-resource#scalability" target="_blank">📄</a></td></tr>
+                    <tr><td>Load Balancer rules</td><td>300</td><td>1,000</td><td>Per LB</td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/azure-subscription-service-limits#load-balancer" target="_blank">📄</a></td></tr>
+                    <tr><td>Application Security Groups</td><td>3,000</td><td>3,000</td><td>Per subscription</td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/virtual-network/application-security-groups" target="_blank">📄</a></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- ==================== VPN GATEWAY ==================== -->
+    <section class="section" id="vpn-gateway">
+        <div class="section-header">
+            <span class="section-icon">🔗</span>
+            <h2>VPN Gateway — SKU Comparison</h2>
+            <span class="section-desc">Since Nov 2025, only AZ (zone-redundant) SKUs can be created</span>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>SKU</th>
+                        <th>Throughput</th>
+                        <th>S2S Tunnels</th>
+                        <th>P2S (IKEv2)</th>
+                        <th>BGP</th>
+                        <th>Zone-Redundant</th>
+                        <th>Use Case</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>VpnGw1AZ</strong></td><td>650 Mbps</td><td>30</td><td>250</td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td><td>Small business, dev/test</td></tr>
+                    <tr><td><strong>VpnGw2AZ</strong></td><td>1.25 Gbps</td><td>30</td><td>500</td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td><td>SMB, moderate workloads</td></tr>
+                    <tr><td><strong>VpnGw3AZ</strong></td><td>2.5 Gbps</td><td>30</td><td>1,000</td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td><td>Enterprise, multi-site</td></tr>
+                    <tr><td><strong>VpnGw4AZ</strong></td><td>5 Gbps</td><td>100</td><td>5,000</td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td><td>Large scale, hybrid cloud</td></tr>
+                    <tr><td><strong>VpnGw5AZ</strong></td><td>10 Gbps</td><td>100</td><td>10,000</td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td><td>Very large scale — otherwise use Virtual WAN</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="callout callout-info">
+            <span class="callout-icon">💡</span>
+            <div>Beyond <strong>100 S2S tunnels</strong>, use <strong>Azure Virtual WAN</strong> instead. Throughput is aggregate across all connections — not guaranteed per tunnel.
+            <br><a class="doc" href="https://learn.microsoft.com/en-us/azure/vpn-gateway/about-gateway-skus" target="_blank">📄 Docs: VPN Gateway SKUs</a>
+            · <a class="doc" href="https://learn.microsoft.com/en-us/azure/vpn-gateway/gateway-sku-consolidation" target="_blank">📄 Docs: SKU consolidation (AZ migration)</a></div>
+        </div>
+    </section>
+
+    <!-- ==================== FIREWALL ==================== -->
+    <section class="section" id="firewall">
+        <div class="section-header">
+            <span class="section-icon">🔥</span>
+            <h2>Azure Firewall — SKU Comparison</h2>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>Basic</th>
+                        <th>Standard</th>
+                        <th>Premium</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Throughput</strong></td><td>250 Mbps</td><td>30 Gbps</td><td>100 Gbps</td></tr>
+                    <tr><td><strong>Autoscaling</strong></td><td><span class="tag tag-no">✗</span></td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td></tr>
+                    <tr><td><strong>Threat Intelligence</strong></td><td><span class="tag tag-partial">Alert</span></td><td><span class="tag tag-yes">Alert/Deny</span></td><td><span class="tag tag-yes">Alert/Deny</span></td></tr>
+                    <tr><td><strong>FQDN Filtering (L7)</strong></td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td></tr>
+                    <tr><td><strong>DNS Proxy</strong></td><td><span class="tag tag-no">✗</span></td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td></tr>
+                    <tr><td><strong>Web Categories</strong></td><td><span class="tag tag-no">✗</span></td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td></tr>
+                    <tr><td><strong>TLS/SSL Inspection</strong></td><td><span class="tag tag-no">✗</span></td><td><span class="tag tag-no">✗</span></td><td><span class="tag tag-yes">✓</span></td></tr>
+                    <tr><td><strong>IDPS</strong></td><td><span class="tag tag-no">✗</span></td><td><span class="tag tag-no">✗</span></td><td><span class="tag tag-yes">✓ (67k+ sigs)</span></td></tr>
+                    <tr><td><strong>URL Filtering (full path)</strong></td><td><span class="tag tag-no">✗</span></td><td><span class="tag tag-no">✗</span></td><td><span class="tag tag-yes">✓</span></td></tr>
+                    <tr><td><strong>Availability Zones</strong></td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td></tr>
+                    <tr><td><strong>Use Case</strong></td><td>SMB, dev/test</td><td>Production, enterprise</td><td>Compliance (PCI, HIPAA)</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="callout callout-warn">
+            <span class="callout-icon">⚠️</span>
+            <div>Enabling TLS Inspection + IDPS in "Deny" mode on Premium reduces effective throughput to <strong>~10 Gbps</strong> per flow. The 100 Gbps figure is aggregate.
+            <br><a class="doc" href="https://learn.microsoft.com/en-us/azure/firewall/firewall-performance" target="_blank">📄 Docs: Firewall performance</a>
+            · <a class="doc" href="https://learn.microsoft.com/en-us/azure/firewall/choose-firewall-sku" target="_blank">📄 Docs: Choose the right SKU</a>
+            · <a class="doc" href="https://learn.microsoft.com/en-us/azure/firewall/features-by-sku" target="_blank">📄 Docs: Features by SKU</a></div>
+        </div>
+    </section>
+
+    <!-- ==================== LOAD BALANCER ==================== -->
+    <section class="section" id="load-balancer">
+        <div class="section-header">
+            <span class="section-icon">⚖️</span>
+            <h2>Azure Load Balancer — Standard vs Gateway</h2>
+        </div>
+
+        <div class="callout callout-warn">
+            <span class="callout-icon">⚠️</span>
+            <div><strong>Basic Load Balancer was retired on September 30, 2025.</strong> Only Standard (and Gateway) SKUs are available.
+            <br><a class="doc" href="https://learn.microsoft.com/en-us/azure/load-balancer/load-balancer-basic-upgrade-guidance" target="_blank">📄 Docs: Upgrade guidance</a></div>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>Standard</th>
+                        <th>Gateway</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Backend pool</strong></td><td>Up to 5,000 instances</td><td>Up to 300 instances</td></tr>
+                    <tr><td><strong>HA Ports</strong></td><td><span class="tag tag-yes">✓</span> (Internal LB)</td><td><span class="tag tag-yes">✓</span></td></tr>
+                    <tr><td><strong>Availability Zones</strong></td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td></tr>
+                    <tr><td><strong>Cross-Region</strong></td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-no">✗</span></td></tr>
+                    <tr><td><strong>Security</strong></td><td>Secure by default (NSG required)</td><td>Transparent to traffic</td></tr>
+                    <tr><td><strong>Outbound NAT Rules</strong></td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-no">✗</span></td></tr>
+                    <tr><td><strong>SLA</strong></td><td>99.99%</td><td>99.99%</td></tr>
+                    <tr><td><strong>Use Case</strong></td><td>Web apps, APIs, services</td><td>NVA chaining (3rd-party firewalls)</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div style="text-align: right;">
+            <a class="doc" href="https://learn.microsoft.com/en-us/azure/load-balancer/skus" target="_blank">📄 Docs: Load Balancer SKUs</a>
+            · <a class="doc" href="https://learn.microsoft.com/en-us/azure/load-balancer/gateway-overview" target="_blank">📄 Docs: Gateway LB overview</a>
+        </div>
+    </section>
+
+    <!-- ==================== DNS ==================== -->
+    <section class="section" id="dns">
+        <div class="section-header">
+            <span class="section-icon">🌐</span>
+            <h2>DNS — Best Practices</h2>
+        </div>
+
+        <div class="tips-grid">
+            <div class="tip-card">
+                <h4>🔗 Centralized Private DNS Zones</h4>
+                <p>Create Private DNS Zones in the <strong>Hub/Connectivity subscription</strong> and link them to Spoke VNets. Never duplicate zones across subscriptions.</p>
+                <a class="doc-link" href="https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/private-link-and-dns-integration-at-scale" target="_blank">📄 Docs: Private Link and DNS integration at scale</a>
+            </div>
+            <div class="tip-card">
+                <h4>🔄 Conditional Forwarders</h4>
+                <p>Use <strong>Azure Private DNS Resolver</strong> to resolve Azure names from on-premises, and on-premises names from Azure. No more custom DNS VMs needed.</p>
+                <a class="doc-link" href="https://learn.microsoft.com/en-us/azure/dns/dns-private-resolver-overview" target="_blank">📄 Docs: Private DNS Resolver overview</a>
+            </div>
+            <div class="tip-card">
+                <h4>🏷️ Naming Convention</h4>
+                <p>Private DNS Zones for Private Endpoints follow the format <code>privatelink.{service}.{domain}</code>. Don't change the names — Azure expects them exactly.</p>
+                <a class="doc-link" href="https://learn.microsoft.com/en-us/azure/private-link/private-endpoint-dns" target="_blank">📄 Docs: Private Endpoint DNS configuration</a>
+            </div>
+            <div class="tip-card">
+                <h4>⚠️ Auto-registration</h4>
+                <p>DNS auto-registration only works for VMs. Only one VNet can be linked with auto-registration per zone. Use it in the Hub for shared VMs.</p>
+                <a class="doc-link" href="https://learn.microsoft.com/en-us/azure/dns/private-dns-autoregistration" target="_blank">📄 Docs: Auto-registration feature</a>
+            </div>
+            <div class="tip-card">
+                <h4>🌍 Split-Brain DNS</h4>
+                <p>When you enable a Private Endpoint, public resolution still works for clients not connected to the VNet. The Private DNS Zone only overrides for clients within the linked VNet.</p>
+                <a class="doc-link" href="https://learn.microsoft.com/en-us/azure/private-link/private-endpoint-dns#on-premises-workloads-using-a-dns-forwarder" target="_blank">📄 Docs: DNS for on-premises workloads</a>
+            </div>
+            <div class="tip-card">
+                <h4>📊 Key Zones to Know</h4>
+                <p><code>privatelink.blob.core.windows.net</code><br>
+                <code>privatelink.database.windows.net</code><br>
+                <code>privatelink.vaultcore.azure.net</code><br>
+                <code>privatelink.azurewebsites.net</code><br>
+                <code>privatelink.azurecr.io</code></p>
+                <a class="doc-link" href="https://learn.microsoft.com/en-us/azure/private-link/private-endpoint-dns#azure-services-dns-zone-configuration" target="_blank">📄 Docs: Full DNS zone list</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== BEST PRACTICES ==================== -->
+    <section class="section" id="best-practices">
+        <div class="section-header">
+            <span class="section-icon">💡</span>
+            <h2>Best Practices — Azure Network Architecture</h2>
+        </div>
+
+        <div class="tips-grid">
+            <div class="tip-card">
+                <h4>🏗️ Hub-and-Spoke as Foundation</h4>
+                <p>Centralize shared services (Firewall, Gateway, Bastion, DNS) in a Hub VNet. Isolate workloads in Spoke VNets peered to the Hub. This is the pattern recommended by the Cloud Adoption Framework.</p>
+                <a class="doc-link" href="https://learn.microsoft.com/en-us/azure/architecture/networking/architecture/hub-spoke" target="_blank">📄 Docs: Hub-spoke network topology</a>
+            </div>
+            <div class="tip-card">
+                <h4>📐 Size Large from Day One</h4>
+                <p>Use <code>/20</code> for the Hub, <code>/22</code> for Spokes. <strong>Subnets cannot be resized</strong> with resources deployed. Always plan 2x your initial need.</p>
+                <a class="doc-link" href="https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/plan-for-ip-addressing" target="_blank">📄 Docs: Plan for IP addressing</a>
+            </div>
+            <div class="tip-card">
+                <h4>🚫 No CIDR Overlap</h4>
+                <p>Plan your address space <strong>before</strong> creating the first VNet. Consider on-premises and other clouds. Overlapping CIDRs block peering and routing.</p>
+                <a class="doc-link" href="https://learn.microsoft.com/en-us/azure/virtual-network/virtual-networks-faq#can-i-connect-vnets-with-identical-or-overlapping-address-ranges" target="_blank">📄 Docs: VNet FAQ (overlapping)</a>
+            </div>
+            <div class="tip-card">
+                <h4>🔥 Force Traffic Through Firewall</h4>
+                <p>Create a UDR <code>0.0.0.0/0 → Azure Firewall</code> on each Spoke subnet. Associate the route table to the subnet — not the VNet. Without this, traffic goes straight to the internet.</p>
+                <a class="doc-link" href="https://learn.microsoft.com/en-us/azure/firewall/tutorial-firewall-deploy-portal#create-a-default-route" target="_blank">📄 Docs: Create a default route</a>
+            </div>
+            <div class="tip-card">
+                <h4>🔒 NSG on Every Subnet</h4>
+                <p>Even with a firewall, apply NSGs to all subnets (except GatewaySubnet and FirewallSubnet). <strong>Defense in depth</strong> principle. Use Application Security Groups to simplify rules.</p>
+                <a class="doc-link" href="https://learn.microsoft.com/en-us/azure/virtual-network/network-security-groups-overview" target="_blank">📄 Docs: NSG overview</a>
+            </div>
+            <div class="tip-card">
+                <h4>🔗 Peering ≠ Transitive</h4>
+                <p>If Spoke A is peered to Hub and Spoke B too, <strong>A and B cannot communicate directly</strong>. Traffic must flow through an NVA/Firewall in the Hub with proper UDRs. Or use Azure Virtual WAN.</p>
+                <a class="doc-link" href="https://learn.microsoft.com/en-us/azure/virtual-network/virtual-network-peering-overview#connectivity" target="_blank">📄 Docs: VNet peering connectivity</a>
+            </div>
+            <div class="tip-card">
+                <h4>🌐 Private Endpoints in Production</h4>
+                <p>Use Private Endpoints (not Service Endpoints) for all PaaS services in production. It's the only way to guarantee 100% private traffic, including from on-premises.</p>
+                <a class="doc-link" href="https://learn.microsoft.com/en-us/azure/private-link/private-link-overview" target="_blank">📄 Docs: Azure Private Link</a>
+            </div>
+            <div class="tip-card">
+                <h4>📡 Accelerated Networking</h4>
+                <p>Enable Accelerated Networking on all VMs that support it. It's free and reduces latency by 50%+. Nearly all SKUs with ≥ 2 vCPUs support it.</p>
+                <a class="doc-link" href="https://learn.microsoft.com/en-us/azure/virtual-network/accelerated-networking-overview" target="_blank">📄 Docs: Accelerated Networking</a>
+            </div>
+            <div class="tip-card">
+                <h4>🔄 NAT Gateway for Egress</h4>
+                <p>Prefer NAT Gateway over individual public IPs for outbound traffic. Provides a stable outbound IP, more SNAT ports, and avoids Load Balancer SNAT port exhaustion.</p>
+                <a class="doc-link" href="https://learn.microsoft.com/en-us/azure/nat-gateway/nat-overview" target="_blank">📄 Docs: NAT Gateway overview</a>
+            </div>
+            <div class="tip-card">
+                <h4>📊 Enable Network Watcher</h4>
+                <p>Enable Network Watcher in every used region. Configure VNet Flow Logs (successor to NSG Flow Logs) to a Storage Account + Log Analytics for auditing and troubleshooting.</p>
+                <a class="doc-link" href="https://learn.microsoft.com/en-us/azure/network-watcher/network-watcher-monitoring-overview" target="_blank">📄 Docs: Network Watcher overview</a>
+            </div>
+            <div class="tip-card">
+                <h4>🏷️ Naming Convention</h4>
+                <p>Follow the CAF: <code>vnet-{workload}-{region}-{env}</code>, <code>snet-{purpose}</code>, <code>nsg-{subnet}</code>, <code>rt-{subnet}</code>. Consistent naming prevents production mistakes.</p>
+                <a class="doc-link" href="https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/resource-naming" target="_blank">📄 Docs: Naming conventions</a>
+            </div>
+            <div class="tip-card">
+                <h4>🔐 MTU & Fragmentation</h4>
+                <p>Azure MTU is <strong>1,500 bytes</strong> for inter-VNet/peering traffic. Don't rely on jumbo frames cross-VNet. Ensure firewalls don't block ICMP "Fragmentation Needed" messages.</p>
+                <a class="doc-link" href="https://learn.microsoft.com/en-us/azure/virtual-network/how-to-virtual-machine-mtu" target="_blank">📄 Docs: VM MTU configuration</a>
+            </div>
+        </div>
+    </section>
+
+</div>
+
+<footer class="footer">
+    <p>Azure Network Cheatsheet — <a href="https://cloud63.fr" target="_blank">cloud63.fr</a></p>
+    <p style="margin-top: 0.5rem;">Information provided as reference. Always check the <a href="https://learn.microsoft.com/en-us/azure/networking/" target="_blank">official Azure documentation</a> for up-to-date data.</p>
+</footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const resultCount = document.getElementById('resultCount');
+
+    searchInput.addEventListener('input', function() {
+        const query = this.value.toLowerCase().trim();
+        const allRows = document.querySelectorAll('tbody tr');
+        const allCards = document.querySelectorAll('.tip-card');
+        const allSections = document.querySelectorAll('.section');
+        let visibleCount = 0;
+
+        if (!query) {
+            allRows.forEach(r => r.classList.remove('hidden'));
+            allCards.forEach(c => c.style.display = '');
+            allSections.forEach(s => s.style.display = '');
+            resultCount.textContent = '';
+            return;
+        }
+
+        allRows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            const match = text.includes(query);
+            row.classList.toggle('hidden', !match);
+            if (match) visibleCount++;
+        });
+
+        allCards.forEach(card => {
+            const text = card.textContent.toLowerCase();
+            const match = text.includes(query);
+            card.style.display = match ? '' : 'none';
+            if (match) visibleCount++;
+        });
+
+        allSections.forEach(section => {
+            const visibleRows = section.querySelectorAll('tbody tr:not(.hidden)');
+            const visibleCardsInSection = Array.from(section.querySelectorAll('.tip-card')).filter(c => c.style.display !== 'none');
+            const hasHub = section.id === 'hub-layout' && section.textContent.toLowerCase().includes(query);
+            const hasCallout = Array.from(section.querySelectorAll('.callout')).some(c => c.textContent.toLowerCase().includes(query));
+
+            if (visibleRows.length > 0 || visibleCardsInSection.length > 0 || hasHub || hasCallout) {
+                section.style.display = '';
+            } else {
+                section.style.display = 'none';
+            }
+        });
+
+        resultCount.textContent = visibleCount + ' result' + (visibleCount !== 1 ? 's' : '');
+    });
+
+    document.querySelectorAll('.nav a').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+    });
+});
+</script>
+
+</body>
+</html>
