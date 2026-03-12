@@ -4,26 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Azure Network Cheatsheet — cloud63.fr</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <style>
         :root {
-            --bg: #0f1117;
-            --bg-card: #161b22;
-            --bg-card-hover: #1c2333;
-            --border: #30363d;
-            --text: #e6edf3;
-            --text-muted: #8b949e;
+            /* Azure portal dark theme palette */
+            --bg: #1b1a19;
+            --bg-card: #292827;
+            --bg-card-hover: #323130;
+            --border: #3b3a39;
+            --text: #f3f2f1;
+            --text-muted: #a19f9d;
             --azure-blue: #0078d4;
-            --azure-light: #3794ff;
-            --green: #3fb950;
-            --yellow: #d29922;
-            --red: #f85149;
-            --orange: #db6d28;
-            --purple: #a371f7;
-            --cyan: #39d2c0;
+            --azure-light: #6cb8f6;
+            --green: #92c353;
+            --yellow: #ffb900;
+            --red: #f1707b;
+            --orange: #e87400;
+            --purple: #b4a0ff;
+            --cyan: #00b7c3;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif;
             background: var(--bg);
             color: var(--text);
             line-height: 1.6;
@@ -31,35 +33,46 @@
         a { color: var(--azure-light); text-decoration: none; }
         a:hover { text-decoration: underline; }
 
-        /* Header */
+        /* Header — Azure gradient */
         .hero {
-            background: linear-gradient(135deg, #0a1628 0%, #0f2847 50%, #0a1628 100%);
-            border-bottom: 1px solid var(--border);
-            padding: 3rem 2rem 2rem;
+            background: linear-gradient(135deg, #001d3d 0%, #003566 40%, #0353a4 70%, #0078d4 100%);
+            padding: 3.5rem 2rem 2.5rem;
             text-align: center;
+            position: relative;
+            overflow: hidden;
         }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(ellipse at 30% 50%, rgba(0,120,212,0.2) 0%, transparent 60%),
+                        radial-gradient(ellipse at 80% 20%, rgba(0,183,195,0.15) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        .hero > * { position: relative; z-index: 1; }
         .hero h1 {
             font-size: 2.5rem;
             font-weight: 700;
-            background: linear-gradient(135deg, var(--azure-light), var(--cyan));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 0.5rem;
+            color: #ffffff;
+            margin-bottom: 0.6rem;
+            letter-spacing: -0.5px;
         }
         .hero p {
-            color: var(--text-muted);
-            font-size: 1.1rem;
+            color: rgba(255,255,255,0.72);
+            font-size: 1.05rem;
             max-width: 700px;
             margin: 0 auto 1.5rem;
+            font-weight: 300;
         }
         .hero .badge {
             display: inline-block;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.18);
             border-radius: 20px;
             padding: 0.3rem 1rem;
             font-size: 0.8rem;
-            color: var(--text-muted);
+            color: rgba(255,255,255,0.65);
         }
 
         /* Search */
@@ -67,7 +80,7 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            background: rgba(15, 17, 23, 0.95);
+            background: rgba(27, 26, 25, 0.95);
             backdrop-filter: blur(10px);
             border-bottom: 1px solid var(--border);
             padding: 0.8rem 2rem;
@@ -83,17 +96,17 @@
             flex: 1;
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 8px;
+            border-radius: 4px;
             padding: 0.6rem 1rem 0.6rem 2.5rem;
             color: var(--text);
             font-size: 0.95rem;
             outline: none;
             transition: border-color 0.2s;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%238b949e' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85zm-5.44.856a5 5 0 1 1 0-10 5 5 0 0 1 0 10z'/%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23a19f9d' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85zm-5.44.856a5 5 0 1 1 0-10 5 5 0 0 1 0 10z'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
             background-position: 0.8rem center;
         }
-        .search-input:focus { border-color: var(--azure-blue); }
+        .search-input:focus { border-color: var(--azure-blue); box-shadow: 0 0 0 1px var(--azure-blue); }
         .search-input::placeholder { color: var(--text-muted); }
         .result-count {
             color: var(--text-muted);
@@ -113,16 +126,16 @@
         .nav a {
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 8px;
+            border-radius: 4px;
             padding: 0.4rem 0.9rem;
             color: var(--text-muted);
             font-size: 0.82rem;
-            transition: all 0.2s;
+            transition: all 0.15s;
         }
         .nav a:hover {
             color: var(--azure-light);
             border-color: var(--azure-blue);
-            background: var(--bg-card-hover);
+            background: rgba(0,120,212,0.12);
             text-decoration: none;
         }
 
@@ -133,8 +146,14 @@
             padding: 2rem;
         }
 
-        /* Section */
-        .section { margin-bottom: 3rem; }
+        /* Section — Azure blade style */
+        .section {
+            margin-bottom: 2rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 1.5rem;
+        }
         .section-header {
             display: flex;
             align-items: center;
@@ -144,7 +163,7 @@
             border-bottom: 1px solid var(--border);
         }
         .section-icon { font-size: 1.5rem; }
-        .section-header h2 { font-size: 1.4rem; font-weight: 600; }
+        .section-header h2 { font-size: 1.3rem; font-weight: 600; }
         .section-header .section-desc {
             color: var(--text-muted);
             font-size: 0.85rem;
@@ -155,12 +174,12 @@
         .table-wrap {
             overflow-x: auto;
             border: 1px solid var(--border);
-            border-radius: 10px;
+            border-radius: 4px;
             margin-bottom: 1.5rem;
         }
         table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
         thead th {
-            background: var(--bg-card);
+            background: #252423;
             padding: 0.7rem 0.9rem;
             text-align: left;
             font-weight: 600;
@@ -172,44 +191,48 @@
         }
         tbody tr {
             border-bottom: 1px solid var(--border);
-            transition: background 0.15s;
+            transition: background 0.1s;
         }
         tbody tr:last-child { border-bottom: none; }
         tbody tr:hover { background: var(--bg-card-hover); }
         tbody td { padding: 0.6rem 0.9rem; vertical-align: top; }
         tbody tr.hidden { display: none; }
 
-        /* Tags */
+        /* Tags — Azure status badges */
         .tag {
             display: inline-block;
             padding: 0.15rem 0.5rem;
-            border-radius: 12px;
+            border-radius: 3px;
             font-size: 0.75rem;
-            font-weight: 500;
+            font-weight: 600;
             white-space: nowrap;
         }
-        .tag-yes { background: rgba(63,185,80,0.15); color: var(--green); }
-        .tag-no { background: rgba(248,81,73,0.15); color: var(--red); }
-        .tag-partial { background: rgba(210,153,34,0.15); color: var(--yellow); }
-        .tag-info { background: rgba(55,148,255,0.15); color: var(--azure-light); }
-        .tag-purple { background: rgba(163,113,247,0.15); color: var(--purple); }
-        .tag-orange { background: rgba(219,109,40,0.15); color: var(--orange); }
-        .tag-cyan { background: rgba(57,210,192,0.15); color: var(--cyan); }
+        .tag-yes { background: rgba(146,195,83,0.15); color: var(--green); }
+        .tag-no { background: rgba(241,112,123,0.15); color: var(--red); }
+        .tag-partial { background: rgba(255,185,0,0.15); color: var(--yellow); }
+        .tag-info { background: rgba(0,120,212,0.15); color: var(--azure-light); }
+        .tag-purple { background: rgba(180,160,255,0.15); color: var(--purple); }
+        .tag-orange { background: rgba(232,116,0,0.15); color: var(--orange); }
+        .tag-cyan { background: rgba(0,183,195,0.15); color: var(--cyan); }
 
-        /* Tip cards */
+        /* Tip cards — blade info tiles */
         .tips-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
             gap: 1rem;
         }
         .tip-card {
-            background: var(--bg-card);
+            background: #252423;
             border: 1px solid var(--border);
-            border-radius: 10px;
+            border-radius: 4px;
             padding: 1.2rem;
-            transition: border-color 0.2s;
+            border-left: 3px solid var(--azure-blue);
+            transition: border-color 0.15s, box-shadow 0.15s;
         }
-        .tip-card:hover { border-color: var(--azure-blue); }
+        .tip-card:hover {
+            border-left-color: var(--azure-light);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
         .tip-card h4 {
             font-size: 0.95rem;
             margin-bottom: 0.5rem;
@@ -222,10 +245,10 @@
             font-size: 0.85rem;
         }
         .tip-card code {
-            background: rgba(55,148,255,0.1);
+            background: rgba(0,120,212,0.15);
             color: var(--azure-light);
             padding: 0.1rem 0.4rem;
-            border-radius: 4px;
+            border-radius: 3px;
             font-size: 0.8rem;
         }
         .tip-card .doc-link {
@@ -234,9 +257,9 @@
             font-size: 0.78rem;
         }
 
-        /* Callout */
+        /* Callout — Azure banner style */
         .callout {
-            border-radius: 8px;
+            border-radius: 4px;
             padding: 1rem 1.2rem;
             margin-bottom: 1rem;
             font-size: 0.88rem;
@@ -245,12 +268,14 @@
             gap: 0.7rem;
         }
         .callout-warn {
-            background: rgba(210,153,34,0.1);
-            border: 1px solid rgba(210,153,34,0.3);
+            background: rgba(255,185,0,0.08);
+            border: 1px solid rgba(255,185,0,0.25);
+            border-left: 4px solid var(--yellow);
         }
         .callout-info {
-            background: rgba(55,148,255,0.08);
-            border: 1px solid rgba(55,148,255,0.25);
+            background: rgba(0,120,212,0.08);
+            border: 1px solid rgba(0,120,212,0.25);
+            border-left: 4px solid var(--azure-blue);
         }
         .callout-icon { font-size: 1.2rem; flex-shrink: 0; }
 
@@ -262,14 +287,14 @@
             margin: 1rem 0;
         }
         .hub-subnet {
-            background: var(--bg-card);
+            background: #252423;
             border: 1px solid var(--border);
-            border-radius: 8px;
+            border-radius: 4px;
             padding: 0.8rem 1rem;
             border-left: 3px solid var(--azure-blue);
         }
         .hub-subnet .name { font-weight: 600; font-size: 0.85rem; margin-bottom: 0.3rem; }
-        .hub-subnet .cidr { color: var(--azure-light); font-family: monospace; font-size: 0.85rem; }
+        .hub-subnet .cidr { color: var(--azure-light); font-family: 'Segoe UI Mono', Consolas, monospace; font-size: 0.85rem; }
         .hub-subnet .usable { color: var(--text-muted); font-size: 0.75rem; }
 
         /* Doc link in tables */
@@ -287,6 +312,7 @@
         @media (max-width: 768px) {
             .hero h1 { font-size: 1.8rem; }
             .container { padding: 1rem; }
+            .section { padding: 1rem; }
             .tips-grid { grid-template-columns: 1fr; }
             .nav { gap: 0.3rem; }
             .nav a { font-size: 0.75rem; padding: 0.3rem 0.6rem; }
@@ -300,6 +326,10 @@
     <h1>☁️ Azure Network Cheatsheet</h1>
     <p>All Azure networking requirements, best practices, limits and SKU comparisons in one place. Stop digging through hundreds of Microsoft docs pages.</p>
     <span class="badge">Last updated: March 2026</span>
+    <div style="margin-top: 0.8rem; font-size: 0.8rem;">
+        <a href="https://github.com/vmisson" target="_blank" style="color: rgba(255,255,255,0.5); margin: 0 0.4rem;">GitHub</a>
+        · <a href="https://www.linkedin.com/in/vmisson/" target="_blank" style="color: rgba(255,255,255,0.5); margin: 0 0.4rem;">LinkedIn</a>
+    </div>
 </div>
 
 <div class="search-container">
@@ -311,18 +341,21 @@
 
 <nav class="nav" id="nav">
     <a href="#hub-layout">🏗️ Hub & Spoke</a>
+    <a href="#vwan">🔀 Virtual WAN</a>
+    <a href="#choose-model">🧭 Hub vs vWAN</a>
     <a href="#subnet-sizing">📐 Subnet Sizing</a>
     <a href="#delegation">📋 Delegations</a>
     <a href="#nsg-udr">🛡️ NSG & UDR</a>
     <a href="#routing">🛣️ Routing</a>
-    <a href="#private-endpoint">🔒 Private Endpoint</a>
     <a href="#vpn-gateway">🔗 VPN Gateway</a>
     <a href="#expressroute">⚡ ExpressRoute</a>
-    <a href="#vwan">🔀 Virtual WAN</a>
     <a href="#firewall">🔥 Azure Firewall</a>
-    <a href="#appgw">⚖️ Application Gateway</a>
+    <a href="#private-endpoint">🔒 Private Endpoint</a>
+    <a href="#outbound">🌍 Outbound Internet</a>
+    <a href="#appgw">⚖️ App Gateway</a>
     <a href="#frontdoor-ddos">🛡️ Front Door & DDoS</a>
     <a href="#dns">🌐 DNS</a>
+    <a href="#ops">🛠️ Ops</a>
     <a href="#limits">📊 Limits & Quotas</a>
     <a href="#best-practices">💡 Best Practices</a>
 </nav>
@@ -410,6 +443,227 @@
         </div>
     </section>
 
+    <!-- ==================== VIRTUAL WAN ==================== -->
+    <section class="section" id="vwan">
+        <div class="section-header">
+            <span class="section-icon">🔀</span>
+            <h2>Azure Virtual WAN</h2>
+            <span class="section-desc">Microsoft-managed global network backbone</span>
+        </div>
+
+        <h3 style="margin: 0 0 1rem; font-size: 1.1rem;">Components</h3>
+        <div class="tips-grid">
+            <div class="tip-card">
+                <h4>🌐 Virtual WAN Resource</h4>
+                <p>The top-level container that holds all virtual hubs. One vWAN resource per organization is typical, with <strong>multiple hubs deployed across regions</strong> for global connectivity.</p>
+                <a class="doc-link" href="https://learn.microsoft.com/en-us/azure/virtual-wan/virtual-wan-about" target="_blank">📄 Docs: What is Azure Virtual WAN?</a>
+            </div>
+            <div class="tip-card">
+                <h4>🏗️ Virtual Hub</h4>
+                <p>A Microsoft-managed VNet in a region. Acts as the central routing engine. Contains gateways (S2S VPN, P2S, ExpressRoute) and connects VNets as spokes. Default throughput: <strong>3 Gbps</strong>, scalable up to <strong>50 Gbps</strong>.</p>
+                <a class="doc-link" href="https://learn.microsoft.com/en-us/azure/virtual-wan/hub-settings" target="_blank">📄 Docs: Virtual hub settings</a>
+            </div>
+            <div class="tip-card">
+                <h4>🔗 Connections</h4>
+                <p>VNets, VPN sites, ExpressRoute circuits, and P2S users connect to the hub via <strong>connections</strong>. VNet connections replace traditional peering — no manual peering needed.</p>
+                <a class="doc-link" href="https://learn.microsoft.com/en-us/azure/virtual-wan/virtual-wan-site-to-site-portal" target="_blank">📄 Docs: Configure site-to-site connection</a>
+            </div>
+            <div class="tip-card">
+                <h4>🛣️ Hub Routing</h4>
+                <p>Automated <strong>any-to-any transit</strong> between all connections (VNets, branches, users). Supports custom route tables for segmentation and isolation (e.g. isolating dev from prod).</p>
+                <a class="doc-link" href="https://learn.microsoft.com/en-us/azure/virtual-wan/about-virtual-hub-routing" target="_blank">📄 Docs: About virtual hub routing</a>
+            </div>
+        </div>
+
+        <h3 style="margin: 2rem 0 1rem; font-size: 1.1rem;">Basic vs Standard Hub</h3>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>Basic</th>
+                        <th>Standard</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Site-to-Site VPN</strong></td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td></tr>
+                    <tr><td><strong>Point-to-Site VPN (User VPN)</strong></td><td><span class="tag tag-no">✗</span></td><td><span class="tag tag-yes">✓</span></td></tr>
+                    <tr><td><strong>ExpressRoute</strong></td><td><span class="tag tag-no">✗</span></td><td><span class="tag tag-yes">✓</span></td></tr>
+                    <tr><td><strong>Inter-hub transit</strong></td><td><span class="tag tag-no">✗</span></td><td><span class="tag tag-yes">✓</span> (global any-to-any)</td></tr>
+                    <tr><td><strong>VNet-to-VNet transit</strong></td><td><span class="tag tag-no">✗</span></td><td><span class="tag tag-yes">✓</span></td></tr>
+                    <tr><td><strong>Azure Firewall / NVA</strong></td><td><span class="tag tag-no">✗</span></td><td><span class="tag tag-yes">✓</span></td></tr>
+                    <tr><td><strong>Custom route tables</strong></td><td><span class="tag tag-no">✗</span></td><td><span class="tag tag-yes">✓</span></td></tr>
+                    <tr><td><strong>Max hub throughput</strong></td><td>VPN only</td><td>Up to 50 Gbps aggregate</td></tr>
+                    <tr><td><strong>Max VNet connections</strong></td><td>Limited</td><td>Up to 1,000</td></tr>
+                    <tr><td><strong>Max S2S VPN connections</strong></td><td>Limited</td><td>Up to 1,000</td></tr>
+                    <tr><td><strong>Upgrade</strong></td><td colspan="2">Basic → Standard (one-way, <strong>cannot downgrade</strong>)</td></tr>
+                    <tr><td><strong>Use Case</strong></td><td>Simple S2S VPN only</td><td>Enterprise, multi-region, hybrid</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div style="text-align: right; margin-top: -1rem; margin-bottom: 1rem;">
+            <a class="doc" href="https://learn.microsoft.com/en-us/azure/virtual-wan/upgrade-virtual-wan" target="_blank">📄 Docs: Upgrade Basic to Standard</a>
+            · <a class="doc" href="https://learn.microsoft.com/en-us/azure/virtual-wan/gateway-settings" target="_blank">📄 Docs: Gateway settings</a>
+        </div>
+
+        <div class="callout callout-info">
+            <span class="callout-icon">💡</span>
+            <div><strong>Virtual WAN vs Hub-and-Spoke:</strong> vWAN is Microsoft-managed and provides automatic transit routing, global hub-to-hub connectivity, and integrated gateways. A custom hub-and-spoke gives you full control over the Hub VNet (NVAs, custom routing, third-party firewalls). Choose vWAN for <strong>large scale, multi-region, many branches</strong>. Choose custom hub-and-spoke for <strong>full control and customization</strong>.
+            <br><a class="doc" href="https://learn.microsoft.com/en-us/azure/virtual-wan/virtual-wan-about#transit-er" target="_blank">📄 Docs: Virtual WAN transit connectivity</a>
+            · <a class="doc" href="https://learn.microsoft.com/en-us/azure/architecture/networking/guide/choose-between-vnet-peering-and-vpn-gateway" target="_blank">📄 Docs: Choose your networking architecture</a></div>
+        </div>
+
+        <div class="callout callout-warn">
+            <span class="callout-icon">⚠️</span>
+            <div>When deploying <strong>Azure Firewall in a vWAN hub</strong>, allocate at least a <strong>/22 address space</strong> for the hub to allow the firewall to scale to maximum throughput.
+            <br><a class="doc" href="https://learn.microsoft.com/en-us/azure/virtual-wan/virtual-wan-faq" target="_blank">📄 Docs: Virtual WAN FAQ</a></div>
+        </div>
+
+        <h3 style="margin: 2rem 0 1rem; font-size: 1.1rem;">Routing Intent — Strongly Recommended</h3>
+
+        <div class="callout callout-info">
+            <span class="callout-icon">💡</span>
+            <div><strong>Routing Intent</strong> is the recommended way to configure routing in Virtual WAN. While not mandatory, it provides a <strong>simple, effective, and extensible</strong> model that eliminates the need for manual route table management. Enable it on every secured hub.</div>
+        </div>
+
+        <div class="tips-grid">
+            <div class="tip-card">
+                <h4>🎯 What is Routing Intent?</h4>
+                <p>A declarative way to tell the vWAN hub: "send all Internet traffic and/or all private traffic through my security solution". No manual route tables, no UDRs — the hub automatically programs the correct routes for all connections (VNets, branches, users).</p>
+                <a class="doc-link" href="https://learn.microsoft.com/en-us/azure/virtual-wan/how-to-routing-policies" target="_blank">📄 Docs: Configure routing policies</a>
+            </div>
+            <div class="tip-card">
+                <h4>📋 Two Routing Policies</h4>
+                <p>
+                    <strong>Internet Traffic Policy</strong> — Hub advertises <code>0.0.0.0/0</code> to all connections. All internet-bound traffic flows through Azure Firewall / NVA / SaaS security in the hub before reaching the internet.<br><br>
+                    <strong>Private Traffic Policy</strong> — All east-west traffic (VNet-to-VNet, branch-to-VNet, inter-hub) flows through the security solution. Full inspection of private traffic across the entire topology.
+                </p>
+                <a class="doc-link" href="https://learn.microsoft.com/en-us/azure/virtual-wan/about-virtual-hub-routing#routing-intent" target="_blank">📄 Docs: About routing intent</a>
+            </div>
+            <div class="tip-card">
+                <h4>✅ Why use it?</h4>
+                <p>
+                    • <strong>Simple</strong> — No manual route tables or propagation config. Declare your intent, the hub handles the rest<br>
+                    • <strong>Effective</strong> — Guarantees all traffic is inspected. No risk of misconfigured routes creating bypass paths<br>
+                    • <strong>Extensible</strong> — Works with Azure Firewall, third-party NVAs, and SaaS security solutions. Add hubs or connections without reconfiguring routing<br>
+                    • <strong>Multi-hub</strong> — Policies apply per hub but work across inter-hub links for global security enforcement
+                </p>
+                <a class="doc-link" href="https://learn.microsoft.com/en-us/azure/virtual-wan/about-virtual-hub-routing" target="_blank">📄 Docs: Virtual hub routing</a>
+            </div>
+        </div>
+
+        <div class="table-wrap" style="margin-top: 1rem;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Routing Policy</th>
+                        <th>What it does</th>
+                        <th>Route advertised</th>
+                        <th>Security solution</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Internet Traffic</strong></td>
+                        <td>All internet egress from VNets, branches, and users goes through the hub's security solution</td>
+                        <td><code>0.0.0.0/0</code></td>
+                        <td>Azure Firewall, NVA, or SaaS</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Private Traffic</strong></td>
+                        <td>All east-west traffic (VNet↔VNet, branch↔VNet, hub↔hub) goes through the hub's security solution</td>
+                        <td>RFC1918 + all VNet/branch prefixes</td>
+                        <td>Azure Firewall, NVA, or SaaS</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="callout callout-warn" style="margin-top: 1rem;">
+            <span class="callout-icon">⚠️</span>
+            <div><strong>Limitations:</strong> One Internet policy and one Private policy per hub. Routing intent applies to all prefixes in a category — no per-prefix granularity. Enabling routing intent replaces any existing custom route tables on the hub. Plan your migration carefully if already using custom routing.
+            <br><a class="doc" href="https://learn.microsoft.com/en-us/azure/virtual-wan/how-to-routing-policies#known-limitations" target="_blank">📄 Docs: Routing intent known limitations</a></div>
+        </div>
+    </section>
+
+    <!-- ==================== CHOOSE MODEL ==================== -->
+    <section class="section" id="choose-model">
+        <div class="section-header">
+            <span class="section-icon">🧭</span>
+            <h2>When to Choose Hub & Spoke vs Virtual WAN</h2>
+            <span class="section-desc">Decision matrix for architecture selection</span>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Decision Area</th>
+                        <th>Prefer Hub & Spoke</th>
+                        <th>Prefer Virtual WAN (Standard)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Scale</strong></td>
+                        <td>Single region or limited number of VNets/branches.</td>
+                        <td>Many VNets, many branches/users.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Multi-Region</strong></td>
+                        <td>Requires manual peering, transit VNets, or VPN mesh between regional hubs — complex to build and maintain.</td>
+                        <td><strong>Native global hub-to-hub transit</strong> with automatic any-to-any routing. <strong>Strongly recommended for multi-region deployments.</strong></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Network Control</strong></td>
+                        <td>Maximum control over UDR, BGP propagation, peering flags, and custom NVA insertion.</td>
+                        <td>Prefer Microsoft-managed connectivity and routing abstractions.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Routing Model</strong></td>
+                        <td>Need granular custom routes and per-subnet exceptions.</td>
+                        <td>Want a simplified model using hub route tables and <strong>Routing Intent</strong>.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Branch Connectivity</strong></td>
+                        <td>Few branches or existing central gateway/NVA design.</td>
+                        <td>Large branch footprint (S2S/P2S/ER) with global transit requirements.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Operations Effort</strong></td>
+                        <td>Team can operate custom hub networking at day-2 (routing, policy drift, troubleshooting).</td>
+                        <td>Team wants faster rollout and lower operational overhead.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Typical Fit</strong></td>
+                        <td>Custom landing zones with strict bespoke design constraints.</td>
+                        <td>Enterprise scale, repeatable global architecture, standardized operations.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div style="text-align: right; margin-top: -1rem; margin-bottom: 1rem;">
+            <a class="doc" href="https://learn.microsoft.com/en-us/azure/architecture/networking/architecture/hub-spoke" target="_blank">📄 Docs: Hub-spoke topology</a>
+            · <a class="doc" href="https://learn.microsoft.com/en-us/azure/virtual-wan/virtual-wan-about" target="_blank">📄 Docs: Virtual WAN overview</a>
+            · <a class="doc" href="https://learn.microsoft.com/en-us/azure/virtual-wan/about-virtual-hub-routing#routing-intent" target="_blank">📄 Docs: Routing Intent</a>
+        </div>
+
+        <div class="callout callout-info">
+            <span class="callout-icon">💡</span>
+            <div><strong>Practical recommendation:</strong> For a single-region deployment with strong custom routing/security requirements, Hub & Spoke gives maximum control. For <strong>multi-region architectures</strong>, choose <strong>vWAN Standard + Routing Intent</strong> — it provides native global hub-to-hub transit, automatic any-to-any routing, and drastically reduces operational complexity compared to manually meshing regional hubs.
+            <br><a class="doc" href="https://learn.microsoft.com/en-us/azure/virtual-wan/virtual-wan-global-transit-network-architecture" target="_blank">📄 Docs: Global transit network architecture</a></div>
+        </div>
+
+        <div class="callout callout-warn">
+            <span class="callout-icon">⚠️</span>
+            <div><strong>Migration note:</strong> moving from custom hub-and-spoke to vWAN often requires route/security redesign and phased cutover by region. Validate asymmetric routing risks and inspect effective routes before each migration wave.
+            <br><a class="doc" href="https://learn.microsoft.com/en-us/azure/virtual-wan/migrate-from-hub-spoke-topology" target="_blank">📄 Docs: Migrate from hub-and-spoke to Virtual WAN</a>
+            · <a class="doc" href="https://learn.microsoft.com/en-us/azure/network-watcher/network-watcher-next-hop-overview" target="_blank">📄 Docs: Next Hop diagnostic</a></div>
+        </div>
+    </section>
+
     <!-- ==================== SUBNET SIZING ==================== -->
     <section class="section" id="subnet-sizing">
         <div class="section-header">
@@ -420,7 +674,7 @@
 
         <div class="callout callout-warn">
             <span class="callout-icon">⚠️</span>
-            <div>Azure reserves <strong>5 IPs per subnet</strong> (.0, .1, .2, .3 and last). A /28 = 16 IPs, only <strong>11 usable</strong>. A /26 = 64 IPs → <strong>59 usable</strong>. Always plan larger since <strong>subnets cannot be resized</strong> once resources are deployed.
+            <div>Azure reserves <strong>5 IPs per subnet</strong> (first 4 addresses and last address of the range). A /28 = 16 IPs, only <strong>11 usable</strong>. A /26 = 64 IPs → <strong>59 usable</strong>. Always plan larger since <strong>subnets cannot be resized</strong> once resources are deployed.
             <br><a class="doc" href="https://learn.microsoft.com/en-us/azure/virtual-network/virtual-networks-faq#are-there-any-restrictions-on-using-ip-addresses-within-these-subnets" target="_blank">📄 Docs: Reserved IPs</a></div>
         </div>
 
@@ -568,7 +822,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr><td><code>GatewaySubnet</code></td><td><span class="tag tag-no">✗ Forbidden</span></td><td><span class="tag tag-partial">⚠ Limited</span></td><td>No NSG. UDR without 0.0.0.0/0 route to NVA</td>
+                    <tr><td><code>GatewaySubnet</code></td><td><span class="tag tag-no">✗ Forbidden</span></td><td><span class="tag tag-partial">⚠ Limited</span></td><td>No NSG. UDR supported but <strong>0.0.0.0/0 → NVA is not allowed</strong></td>
                         <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/vpn-gateway/vpn-gateway-about-vpn-gateway-settings#gwsub" target="_blank">📄</a></td></tr>
                     <tr><td><code>AzureFirewallSubnet</code></td><td><span class="tag tag-no">✗ Forbidden</span></td><td><span class="tag tag-yes">✓</span></td><td>UDR only for management (forced tunneling)</td>
                         <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/firewall/firewall-faq#can-i-configure-nsgs-on-the-azurefirewallsubnet" target="_blank">📄</a></td></tr>
@@ -722,96 +976,6 @@
         </div>
     </section>
 
-    <!-- ==================== PRIVATE ENDPOINT vs SERVICE ENDPOINT ==================== -->
-    <section class="section" id="private-endpoint">
-        <div class="section-header">
-            <span class="section-icon">🔒</span>
-            <h2>Private Endpoint vs Service Endpoint</h2>
-            <span class="section-desc">When to use which</span>
-        </div>
-
-        <div class="table-wrap">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Criteria</th>
-                        <th>Service Endpoint</th>
-                        <th>Private Endpoint</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr><td><strong>IP Type</strong></td><td>Public IP of the service</td><td>Private IP in your VNet</td></tr>
-                    <tr><td><strong>Granularity</strong></td><td>Subnet level</td><td>Resource level (NIC)</td></tr>
-                    <tr><td><strong>Isolation</strong></td><td>Partial (need firewall rules too)</td><td>Complete — no internet exposure</td></tr>
-                    <tr><td><strong>DNS</strong></td><td>Public DNS</td><td>Private DNS Zone required</td></tr>
-                    <tr><td><strong>On-Premises Access</strong></td><td><span class="tag tag-no">No</span></td><td><span class="tag tag-yes">Yes</span> (via VPN/ExpressRoute)</td></tr>
-                    <tr><td><strong>Cross-Region</strong></td><td><span class="tag tag-no">No</span></td><td><span class="tag tag-yes">Yes</span></td></tr>
-                    <tr><td><strong>Cost</strong></td><td><span class="tag tag-yes">Free</span></td><td><span class="tag tag-orange">~$7.30/month + data</span></td></tr>
-                    <tr><td><strong>Complexity</strong></td><td>Simple</td><td>Medium (DNS, NSG config)</td></tr>
-                    <tr><td><strong>Recommendation</strong></td><td>Dev/Test, non-critical workloads</td><td><strong>Production, compliance, hybrid</strong></td></tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div style="text-align: right; margin: -1rem 0 1rem;">
-            <a class="doc" href="https://learn.microsoft.com/en-us/azure/private-link/private-endpoint-overview" target="_blank">📄 Private Endpoint overview</a>
-            · <a class="doc" href="https://learn.microsoft.com/en-us/azure/virtual-network/virtual-network-service-endpoints-overview" target="_blank">📄 Service Endpoint overview</a>
-        </div>
-
-        <h3 style="margin: 1.5rem 0 1rem; font-size: 1.1rem;">Per-Service Support</h3>
-        <div class="table-wrap">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Azure Service</th>
-                        <th>Service Endpoint</th>
-                        <th>Private Endpoint</th>
-                        <th>Private DNS Zone</th>
-                        <th>Docs</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr><td>Azure Storage (Blob/File/Queue/Table)</td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td><td><code>privatelink.blob.core.windows.net</code></td>
-                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/storage/common/storage-private-endpoints" target="_blank">📄</a></td></tr>
-                    <tr><td>Azure SQL Database</td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td><td><code>privatelink.database.windows.net</code></td>
-                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/azure-sql/database/private-endpoint-overview" target="_blank">📄</a></td></tr>
-                    <tr><td>Azure Cosmos DB</td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td><td><code>privatelink.documents.azure.com</code></td>
-                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/cosmos-db/how-to-configure-private-endpoints" target="_blank">📄</a></td></tr>
-                    <tr><td>Azure Key Vault</td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td><td><code>privatelink.vaultcore.azure.net</code></td>
-                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/key-vault/general/private-link-service" target="_blank">📄</a></td></tr>
-                    <tr><td>Azure Container Registry</td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td><td><code>privatelink.azurecr.io</code></td>
-                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/container-registry/container-registry-private-link" target="_blank">📄</a></td></tr>
-                    <tr><td>Azure Event Hubs</td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td><td><code>privatelink.servicebus.windows.net</code></td>
-                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/event-hubs/private-link-service" target="_blank">📄</a></td></tr>
-                    <tr><td>Azure Service Bus</td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td><td><code>privatelink.servicebus.windows.net</code></td>
-                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/service-bus-messaging/private-link-service" target="_blank">📄</a></td></tr>
-                    <tr><td>Azure App Service</td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td><td><code>privatelink.azurewebsites.net</code></td>
-                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/app-service/networking/private-endpoint" target="_blank">📄</a></td></tr>
-                    <tr><td>Azure Database for PostgreSQL</td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td><td><code>privatelink.postgres.database.azure.com</code></td>
-                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/postgresql/flexible-server/concepts-networking-private-link" target="_blank">📄</a></td></tr>
-                    <tr><td>Azure Database for MySQL</td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td><td><code>privatelink.mysql.database.azure.com</code></td>
-                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/mysql/flexible-server/concepts-networking-private-link" target="_blank">📄</a></td></tr>
-                    <tr><td>Azure Synapse Analytics</td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td><td><code>privatelink.sql.azuresynapse.net</code></td>
-                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/synapse-analytics/security/synapse-workspace-managed-private-endpoints" target="_blank">📄</a></td></tr>
-                    <tr><td>Azure Monitor (Log Analytics)</td><td><span class="tag tag-no">✗</span></td><td><span class="tag tag-yes">✓</span></td><td><code>privatelink.monitor.azure.com</code></td>
-                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/azure-monitor/logs/private-link-security" target="_blank">📄</a></td></tr>
-                    <tr><td>Azure Machine Learning</td><td><span class="tag tag-no">✗</span></td><td><span class="tag tag-yes">✓</span></td><td><code>privatelink.api.azureml.ms</code></td>
-                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/machine-learning/how-to-configure-private-link" target="_blank">📄</a></td></tr>
-                    <tr><td>Azure Data Factory</td><td><span class="tag tag-no">✗</span></td><td><span class="tag tag-yes">✓</span></td><td><code>privatelink.datafactory.azure.net</code></td>
-                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/data-factory/data-factory-private-link" target="_blank">📄</a></td></tr>
-                    <tr><td>Azure OpenAI / Cognitive Services</td><td><span class="tag tag-no">✗</span></td><td><span class="tag tag-yes">✓</span></td><td><code>privatelink.cognitiveservices.azure.com</code></td>
-                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/ai-services/cognitive-services-virtual-networks#use-private-endpoints" target="_blank">📄</a></td></tr>
-                    <tr><td>Azure Backup</td><td><span class="tag tag-no">✗</span></td><td><span class="tag tag-yes">✓</span></td><td><code>privatelink.{region}.backup.windowsazure.com</code></td>
-                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/backup/private-endpoints" target="_blank">📄</a></td></tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div style="text-align: right; margin-top: -1rem;">
-            <a class="doc" href="https://learn.microsoft.com/en-us/azure/private-link/availability" target="_blank">📄 Full list: Private Link availability by service</a>
-        </div>
-    </section>
-
     <!-- ==================== VPN GATEWAY ==================== -->
     <section class="section" id="vpn-gateway">
         <div class="section-header">
@@ -957,150 +1121,6 @@
 
     </section>
 
-    <!-- ==================== VIRTUAL WAN ==================== -->
-    <section class="section" id="vwan">
-        <div class="section-header">
-            <span class="section-icon">🔀</span>
-            <h2>Azure Virtual WAN</h2>
-            <span class="section-desc">Microsoft-managed global network backbone</span>
-        </div>
-
-        <h3 style="margin: 0 0 1rem; font-size: 1.1rem;">Components</h3>
-        <div class="tips-grid">
-            <div class="tip-card">
-                <h4>🌐 Virtual WAN Resource</h4>
-                <p>The top-level container that holds all virtual hubs. One vWAN per region is typical but it supports <strong>multiple hubs across regions</strong> for global connectivity.</p>
-                <a class="doc-link" href="https://learn.microsoft.com/en-us/azure/virtual-wan/virtual-wan-about" target="_blank">📄 Docs: What is Azure Virtual WAN?</a>
-            </div>
-            <div class="tip-card">
-                <h4>🏗️ Virtual Hub</h4>
-                <p>A Microsoft-managed VNet in a region. Acts as the central routing engine. Contains gateways (S2S VPN, P2S, ExpressRoute) and connects VNets as spokes. Default throughput: <strong>3 Gbps</strong>, scalable up to <strong>50 Gbps</strong>.</p>
-                <a class="doc-link" href="https://learn.microsoft.com/en-us/azure/virtual-wan/hub-settings" target="_blank">📄 Docs: Virtual hub settings</a>
-            </div>
-            <div class="tip-card">
-                <h4>🔗 Connections</h4>
-                <p>VNets, VPN sites, ExpressRoute circuits, and P2S users connect to the hub via <strong>connections</strong>. VNet connections replace traditional peering — no manual peering needed.</p>
-                <a class="doc-link" href="https://learn.microsoft.com/en-us/azure/virtual-wan/virtual-wan-site-to-site-portal" target="_blank">📄 Docs: Configure site-to-site connection</a>
-            </div>
-            <div class="tip-card">
-                <h4>🛣️ Hub Routing</h4>
-                <p>Automated <strong>any-to-any transit</strong> between all connections (VNets, branches, users). Supports custom route tables for segmentation and isolation (e.g. isolating dev from prod).</p>
-                <a class="doc-link" href="https://learn.microsoft.com/en-us/azure/virtual-wan/about-virtual-hub-routing" target="_blank">📄 Docs: About virtual hub routing</a>
-            </div>
-        </div>
-
-        <h3 style="margin: 2rem 0 1rem; font-size: 1.1rem;">Basic vs Standard Hub</h3>
-        <div class="table-wrap">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Feature</th>
-                        <th>Basic</th>
-                        <th>Standard</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr><td><strong>Site-to-Site VPN</strong></td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td></tr>
-                    <tr><td><strong>Point-to-Site VPN (User VPN)</strong></td><td><span class="tag tag-no">✗</span></td><td><span class="tag tag-yes">✓</span></td></tr>
-                    <tr><td><strong>ExpressRoute</strong></td><td><span class="tag tag-no">✗</span></td><td><span class="tag tag-yes">✓</span></td></tr>
-                    <tr><td><strong>Inter-hub transit</strong></td><td><span class="tag tag-no">✗</span></td><td><span class="tag tag-yes">✓</span> (global any-to-any)</td></tr>
-                    <tr><td><strong>VNet-to-VNet transit</strong></td><td><span class="tag tag-no">✗</span></td><td><span class="tag tag-yes">✓</span></td></tr>
-                    <tr><td><strong>Azure Firewall / NVA</strong></td><td><span class="tag tag-no">✗</span></td><td><span class="tag tag-yes">✓</span></td></tr>
-                    <tr><td><strong>Custom route tables</strong></td><td><span class="tag tag-no">✗</span></td><td><span class="tag tag-yes">✓</span></td></tr>
-                    <tr><td><strong>Max hub throughput</strong></td><td>VPN only</td><td>Up to 50 Gbps aggregate</td></tr>
-                    <tr><td><strong>Max VNet connections</strong></td><td>Limited</td><td>Up to 1,000</td></tr>
-                    <tr><td><strong>Max S2S VPN connections</strong></td><td>Limited</td><td>Up to 1,000</td></tr>
-                    <tr><td><strong>Upgrade</strong></td><td colspan="2">Basic → Standard (one-way, <strong>cannot downgrade</strong>)</td></tr>
-                    <tr><td><strong>Use Case</strong></td><td>Simple S2S VPN only</td><td>Enterprise, multi-region, hybrid</td></tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div style="text-align: right; margin-top: -1rem; margin-bottom: 1rem;">
-            <a class="doc" href="https://learn.microsoft.com/en-us/azure/virtual-wan/upgrade-virtual-wan" target="_blank">📄 Docs: Upgrade Basic to Standard</a>
-            · <a class="doc" href="https://learn.microsoft.com/en-us/azure/virtual-wan/gateway-settings" target="_blank">📄 Docs: Gateway settings</a>
-        </div>
-
-        <div class="callout callout-info">
-            <span class="callout-icon">💡</span>
-            <div><strong>Virtual WAN vs Hub-and-Spoke:</strong> vWAN is Microsoft-managed and provides automatic transit routing, global hub-to-hub connectivity, and integrated gateways. A custom hub-and-spoke gives you full control over the Hub VNet (NVAs, custom routing, third-party firewalls). Choose vWAN for <strong>large scale, multi-region, many branches</strong>. Choose custom hub-and-spoke for <strong>full control and customization</strong>.
-            <br><a class="doc" href="https://learn.microsoft.com/en-us/azure/virtual-wan/virtual-wan-about#transit-er" target="_blank">📄 Docs: Virtual WAN transit connectivity</a>
-            · <a class="doc" href="https://learn.microsoft.com/en-us/azure/architecture/networking/guide/choose-between-vnet-peering-and-vpn-gateway" target="_blank">📄 Docs: Choose your networking architecture</a></div>
-        </div>
-
-        <div class="callout callout-warn">
-            <span class="callout-icon">⚠️</span>
-            <div>When deploying <strong>Azure Firewall in a vWAN hub</strong>, allocate at least a <strong>/22 address space</strong> for the hub to allow the firewall to scale to maximum throughput.
-            <br><a class="doc" href="https://learn.microsoft.com/en-us/azure/virtual-wan/virtual-wan-faq" target="_blank">📄 Docs: Virtual WAN FAQ</a></div>
-        </div>
-
-        <h3 style="margin: 2rem 0 1rem; font-size: 1.1rem;">Routing Intent — Strongly Recommended</h3>
-
-        <div class="callout callout-info">
-            <span class="callout-icon">💡</span>
-            <div><strong>Routing Intent</strong> is the recommended way to configure routing in Virtual WAN. While not mandatory, it provides a <strong>simple, effective, and extensible</strong> model that eliminates the need for manual route table management. Enable it on every secured hub.</div>
-        </div>
-
-        <div class="tips-grid">
-            <div class="tip-card">
-                <h4>🎯 What is Routing Intent?</h4>
-                <p>A declarative way to tell the vWAN hub: "send all Internet traffic and/or all private traffic through my security solution". No manual route tables, no UDRs — the hub automatically programs the correct routes for all connections (VNets, branches, users).</p>
-                <a class="doc-link" href="https://learn.microsoft.com/en-us/azure/virtual-wan/how-to-routing-policies" target="_blank">📄 Docs: Configure routing policies</a>
-            </div>
-            <div class="tip-card">
-                <h4>📋 Two Routing Policies</h4>
-                <p>
-                    <strong>Internet Traffic Policy</strong> — Hub advertises <code>0.0.0.0/0</code> to all connections. All internet-bound traffic flows through Azure Firewall / NVA / SaaS security in the hub before reaching the internet.<br><br>
-                    <strong>Private Traffic Policy</strong> — All east-west traffic (VNet-to-VNet, branch-to-VNet, inter-hub) flows through the security solution. Full inspection of private traffic across the entire topology.
-                </p>
-                <a class="doc-link" href="https://learn.microsoft.com/en-us/azure/virtual-wan/about-virtual-hub-routing#routing-intent" target="_blank">📄 Docs: About routing intent</a>
-            </div>
-            <div class="tip-card">
-                <h4>✅ Why use it?</h4>
-                <p>
-                    • <strong>Simple</strong> — No manual route tables or propagation config. Declare your intent, the hub handles the rest<br>
-                    • <strong>Effective</strong> — Guarantees all traffic is inspected. No risk of misconfigured routes creating bypass paths<br>
-                    • <strong>Extensible</strong> — Works with Azure Firewall, third-party NVAs, and SaaS security solutions. Add hubs or connections without reconfiguring routing<br>
-                    • <strong>Multi-hub</strong> — Policies apply per hub but work across inter-hub links for global security enforcement
-                </p>
-                <a class="doc-link" href="https://learn.microsoft.com/en-us/azure/virtual-wan/about-virtual-hub-routing" target="_blank">📄 Docs: Virtual hub routing</a>
-            </div>
-        </div>
-
-        <div class="table-wrap" style="margin-top: 1rem;">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Routing Policy</th>
-                        <th>What it does</th>
-                        <th>Route advertised</th>
-                        <th>Security solution</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>Internet Traffic</strong></td>
-                        <td>All internet egress from VNets, branches, and users goes through the hub's security solution</td>
-                        <td><code>0.0.0.0/0</code></td>
-                        <td>Azure Firewall, NVA, or SaaS</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Private Traffic</strong></td>
-                        <td>All east-west traffic (VNet↔VNet, branch↔VNet, hub↔hub) goes through the hub's security solution</td>
-                        <td>RFC1918 + all VNet/branch prefixes</td>
-                        <td>Azure Firewall, NVA, or SaaS</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="callout callout-warn" style="margin-top: 1rem;">
-            <span class="callout-icon">⚠️</span>
-            <div><strong>Limitations:</strong> One Internet policy and one Private policy per hub. Routing intent applies to all prefixes in a category — no per-prefix granularity. Enabling routing intent replaces any existing custom route tables on the hub. Plan your migration carefully if already using custom routing.
-            <br><a class="doc" href="https://learn.microsoft.com/en-us/azure/virtual-wan/how-to-routing-policies#known-limitations" target="_blank">📄 Docs: Routing intent known limitations</a></div>
-        </div>
-    </section>
-
     <!-- ==================== FIREWALL ==================== -->
     <section class="section" id="firewall">
         <div class="section-header">
@@ -1140,6 +1160,198 @@
             <br><a class="doc" href="https://learn.microsoft.com/en-us/azure/firewall/firewall-performance" target="_blank">📄 Docs: Firewall performance</a>
             · <a class="doc" href="https://learn.microsoft.com/en-us/azure/firewall/choose-firewall-sku" target="_blank">📄 Docs: Choose the right SKU</a>
             · <a class="doc" href="https://learn.microsoft.com/en-us/azure/firewall/features-by-sku" target="_blank">📄 Docs: Features by SKU</a></div>
+        </div>
+    </section>
+
+    <!-- ==================== PRIVATE ENDPOINT vs SERVICE ENDPOINT ==================== -->
+    <section class="section" id="private-endpoint">
+        <div class="section-header">
+            <span class="section-icon">🔒</span>
+            <h2>Private Endpoint vs Service Endpoint</h2>
+            <span class="section-desc">When to use which</span>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Criteria</th>
+                        <th>Service Endpoint</th>
+                        <th>Private Endpoint</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>IP Type</strong></td><td>Public IP of the service</td><td>Private IP in your VNet</td></tr>
+                    <tr><td><strong>Granularity</strong></td><td>Subnet level</td><td>Resource level (NIC)</td></tr>
+                    <tr><td><strong>Isolation</strong></td><td>Partial (need firewall rules too)</td><td>Complete — no internet exposure</td></tr>
+                    <tr><td><strong>DNS</strong></td><td>Public DNS</td><td>Private DNS Zone required</td></tr>
+                    <tr><td><strong>On-Premises Access</strong></td><td><span class="tag tag-no">No</span></td><td><span class="tag tag-yes">Yes</span> (via VPN/ExpressRoute)</td></tr>
+                    <tr><td><strong>Cross-Region</strong></td><td><span class="tag tag-no">No</span></td><td><span class="tag tag-yes">Yes</span></td></tr>
+                    <tr><td><strong>Cost</strong></td><td><span class="tag tag-yes">Free</span></td><td><span class="tag tag-orange">~$7.30/month + data</span></td></tr>
+                    <tr><td><strong>Complexity</strong></td><td>Simple</td><td>Medium (DNS, NSG config)</td></tr>
+                    <tr><td><strong>Recommendation</strong></td><td>Dev/Test, non-critical workloads</td><td><strong>Production, compliance, hybrid</strong></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div style="text-align: right; margin: -1rem 0 1rem;">
+            <a class="doc" href="https://learn.microsoft.com/en-us/azure/private-link/private-endpoint-overview" target="_blank">📄 Private Endpoint overview</a>
+            · <a class="doc" href="https://learn.microsoft.com/en-us/azure/virtual-network/virtual-network-service-endpoints-overview" target="_blank">📄 Service Endpoint overview</a>
+        </div>
+
+        <h3 style="margin: 1.5rem 0 1rem; font-size: 1.1rem;">Per-Service Support</h3>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Azure Service</th>
+                        <th>Service Endpoint</th>
+                        <th>Private Endpoint</th>
+                        <th>Private DNS Zone</th>
+                        <th>Docs</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Azure Storage (Blob/File/Queue/Table)</td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td><td><code>privatelink.blob.core.windows.net</code></td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/storage/common/storage-private-endpoints" target="_blank">📄</a></td></tr>
+                    <tr><td>Azure SQL Database</td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td><td><code>privatelink.database.windows.net</code></td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/azure-sql/database/private-endpoint-overview" target="_blank">📄</a></td></tr>
+                    <tr><td>Azure Cosmos DB</td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td><td><code>privatelink.documents.azure.com</code></td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/cosmos-db/how-to-configure-private-endpoints" target="_blank">📄</a></td></tr>
+                    <tr><td>Azure Key Vault</td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td><td><code>privatelink.vaultcore.azure.net</code></td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/key-vault/general/private-link-service" target="_blank">📄</a></td></tr>
+                    <tr><td>Azure Container Registry</td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td><td><code>privatelink.azurecr.io</code></td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/container-registry/container-registry-private-link" target="_blank">📄</a></td></tr>
+                    <tr><td>Azure Event Hubs</td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td><td><code>privatelink.servicebus.windows.net</code></td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/event-hubs/private-link-service" target="_blank">📄</a></td></tr>
+                    <tr><td>Azure Service Bus</td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td><td><code>privatelink.servicebus.windows.net</code></td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/service-bus-messaging/private-link-service" target="_blank">📄</a></td></tr>
+                    <tr><td>Azure App Service</td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td><td><code>privatelink.azurewebsites.net</code></td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/app-service/networking/private-endpoint" target="_blank">📄</a></td></tr>
+                    <tr><td>Azure Database for PostgreSQL</td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td><td><code>privatelink.postgres.database.azure.com</code></td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/postgresql/flexible-server/concepts-networking-private-link" target="_blank">📄</a></td></tr>
+                    <tr><td>Azure Database for MySQL</td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td><td><code>privatelink.mysql.database.azure.com</code></td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/mysql/flexible-server/concepts-networking-private-link" target="_blank">📄</a></td></tr>
+                    <tr><td>Azure Synapse Analytics</td><td><span class="tag tag-yes">✓</span></td><td><span class="tag tag-yes">✓</span></td><td><code>privatelink.sql.azuresynapse.net</code></td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/synapse-analytics/security/synapse-workspace-managed-private-endpoints" target="_blank">📄</a></td></tr>
+                    <tr><td>Azure Monitor (Log Analytics)</td><td><span class="tag tag-no">✗</span></td><td><span class="tag tag-yes">✓</span></td><td><code>privatelink.monitor.azure.com</code></td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/azure-monitor/logs/private-link-security" target="_blank">📄</a></td></tr>
+                    <tr><td>Azure Machine Learning</td><td><span class="tag tag-no">✗</span></td><td><span class="tag tag-yes">✓</span></td><td><code>privatelink.api.azureml.ms</code></td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/machine-learning/how-to-configure-private-link" target="_blank">📄</a></td></tr>
+                    <tr><td>Azure Data Factory</td><td><span class="tag tag-no">✗</span></td><td><span class="tag tag-yes">✓</span></td><td><code>privatelink.datafactory.azure.net</code></td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/data-factory/data-factory-private-link" target="_blank">📄</a></td></tr>
+                    <tr><td>Azure OpenAI / Cognitive Services</td><td><span class="tag tag-no">✗</span></td><td><span class="tag tag-yes">✓</span></td><td><code>privatelink.cognitiveservices.azure.com</code></td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/ai-services/cognitive-services-virtual-networks#use-private-endpoints" target="_blank">📄</a></td></tr>
+                    <tr><td>Azure Backup</td><td><span class="tag tag-no">✗</span></td><td><span class="tag tag-yes">✓</span></td><td><code>privatelink.{region}.backup.windowsazure.com</code></td>
+                        <td><a class="doc" href="https://learn.microsoft.com/en-us/azure/backup/private-endpoints" target="_blank">📄</a></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div style="text-align: right; margin-top: -1rem;">
+            <a class="doc" href="https://learn.microsoft.com/en-us/azure/private-link/availability" target="_blank">📄 Full list: Private Link availability by service</a>
+        </div>
+    </section>
+
+    <!-- ==================== OUTBOUND INTERNET ==================== -->
+    <section class="section" id="outbound">
+        <div class="section-header">
+            <span class="section-icon">🌍</span>
+            <h2>Outbound Internet — NAT Gateway & Options</h2>
+            <span class="section-desc">How VMs and services reach the internet, and how to control it</span>
+        </div>
+
+        <h3 style="margin: 0 0 1rem; font-size: 1.1rem;">Outbound Methods Comparison</h3>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Method</th>
+                        <th>Predictable IP</th>
+                        <th>Scale (SNAT ports)</th>
+                        <th>Cost</th>
+                        <th>Use Case</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>NAT Gateway</strong></td>
+                        <td><span class="tag tag-yes">✓</span> up to 16 PIPs</td>
+                        <td><span class="tag tag-yes">64k per IP</span> (up to 1M total)</td>
+                        <td>~$32/month + data</td>
+                        <td><strong>Recommended default</strong> for predictable, scalable egress</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Azure Firewall (forced tunnel)</strong></td>
+                        <td><span class="tag tag-yes">✓</span> Firewall PIP(s)</td>
+                        <td><span class="tag tag-yes">~2,496 per PIP</span></td>
+                        <td>Firewall cost (from ~$912/month)</td>
+                        <td>Centralized egress with L3-L7 filtering + FQDN rules</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Load Balancer outbound rules</strong></td>
+                        <td><span class="tag tag-yes">✓</span> LB frontend IPs</td>
+                        <td><span class="tag tag-partial">Configurable per rule</span></td>
+                        <td>LB cost</td>
+                        <td>When LB is already deployed and simple egress is sufficient</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Instance-level Public IP</strong></td>
+                        <td><span class="tag tag-yes">✓</span> per VM</td>
+                        <td><span class="tag tag-partial">64k per VM</span></td>
+                        <td>PIP cost per VM</td>
+                        <td>Individual VMs needing a dedicated outbound identity</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Default outbound access</strong></td>
+                        <td><span class="tag tag-no">✗</span> Random IP</td>
+                        <td><span class="tag tag-no">Limited</span></td>
+                        <td>Free</td>
+                        <td><strong>Deprecated since Sept 2025.</strong> Do not rely on it</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div style="text-align: right; margin-top: -1rem; margin-bottom: 1rem;">
+            <a class="doc" href="https://learn.microsoft.com/en-us/azure/virtual-network/ip-services/default-outbound-access" target="_blank">📄 Docs: Default outbound access retirement</a>
+            · <a class="doc" href="https://learn.microsoft.com/en-us/azure/nat-gateway/nat-overview" target="_blank">📄 Docs: NAT Gateway overview</a>
+        </div>
+
+        <h3 style="margin: 2rem 0 1rem; font-size: 1.1rem;">NAT Gateway — Key Facts</h3>
+        <div class="tips-grid">
+            <div class="tip-card">
+                <h4>📐 Subnet-level association</h4>
+                <p>NAT Gateway is assigned per subnet. All resources in that subnet use the NAT Gateway for outbound. It <strong>overrides</strong> LB outbound rules and default outbound access. However, <strong>instance-level public IPs take precedence</strong> over NAT Gateway — a VM with its own PIP will use that PIP for egress.</p>
+                <a class="doc-link" href="https://learn.microsoft.com/en-us/azure/nat-gateway/nat-gateway-resource" target="_blank">📄 Docs: NAT Gateway resource</a>
+            </div>
+            <div class="tip-card">
+                <h4>🔢 Up to 16 Public IPs</h4>
+                <p>Attach up to <strong>16 public IPs</strong> or a <strong>public IP prefix</strong> for a maximum of ~1 million concurrent SNAT ports. Azure distributes flows across all IPs automatically.</p>
+                <a class="doc-link" href="https://learn.microsoft.com/en-us/azure/nat-gateway/nat-gateway-resource#scalability" target="_blank">📄 Docs: NAT Gateway scalability</a>
+            </div>
+            <div class="tip-card">
+                <h4>⚡ No SNAT exhaustion</h4>
+                <p>Unlike LB outbound rules, NAT Gateway dynamically allocates SNAT ports on demand (up to 64k per IP). Eliminates the classic SNAT port exhaustion problem that plagues Load Balancer-based egress.</p>
+                <a class="doc-link" href="https://learn.microsoft.com/en-us/azure/nat-gateway/troubleshoot-nat-gateway#snat-exhaustion" target="_blank">📄 Docs: Troubleshoot SNAT exhaustion</a>
+            </div>
+            <div class="tip-card">
+                <h4>🔒 Outbound-only</h4>
+                <p>NAT Gateway provides <strong>outbound and return traffic only</strong>. It does not allow unsolicited inbound connections. For inbound, use Load Balancer, Application Gateway, or instance-level PIPs.</p>
+                <a class="doc-link" href="https://learn.microsoft.com/en-us/azure/nat-gateway/nat-overview" target="_blank">📄 Docs: NAT Gateway overview</a>
+            </div>
+        </div>
+
+        <div class="callout callout-info">
+            <span class="callout-icon">💡</span>
+            <div><strong>Recommended pattern in hub-and-spoke:</strong> In a forced-tunnel architecture (0.0.0.0/0 → NVA/Firewall), outbound internet goes through the Firewall which provides centralized filtering and logging. Use <strong>NAT Gateway in the Firewall subnet</strong> or attach PIPs to the Firewall itself for the actual egress IPs. For workloads with the internet exception pattern (0.0.0.0/0 → Internet), use NAT Gateway directly on the spoke subnet for predictable, scalable egress without going through the hub.
+            <br><a class="doc" href="https://learn.microsoft.com/en-us/azure/nat-gateway/nat-gateway-resource#nat-gateway-and-azure-firewall" target="_blank">📄 Docs: NAT Gateway with Azure Firewall</a></div>
+        </div>
+
+        <div class="callout callout-warn">
+            <span class="callout-icon">⚠️</span>
+            <div><strong>Default outbound access has been retired (Sept 2025).</strong> VMs/VMSS created without an explicit outbound method have <strong>no internet access</strong>. Always deploy NAT Gateway, a Load Balancer with outbound rules, or instance-level PIPs explicitly.
+            <br><a class="doc" href="https://learn.microsoft.com/en-us/azure/virtual-network/ip-services/default-outbound-access" target="_blank">📄 Docs: Default outbound access</a></div>
         </div>
     </section>
 
@@ -1315,6 +1527,16 @@
                 <a class="doc-link" href="https://learn.microsoft.com/en-us/azure/dns/dns-private-resolver-overview" target="_blank">📄 Docs: Private DNS Resolver overview</a>
             </div>
             <div class="tip-card">
+                <h4>🧩 DNS Private Resolver — Architecture</h4>
+                <p>Deploy the Resolver in a <strong>dedicated Spoke VNet</strong> (or Shared Services Spoke). It requires two dedicated subnets: one for the <strong>inbound endpoint</strong> (on-prem → Azure resolution, min /28) and one for the <strong>outbound endpoint</strong> (Azure → on-prem forwarding, min /28). Link the Resolver's VNet to all Private DNS Zones so inbound queries can resolve Private Endpoint records.</p>
+                <a class="doc-link" href="https://learn.microsoft.com/en-us/azure/dns/dns-private-resolver-overview" target="_blank">📄 Docs: Private DNS Resolver overview</a>
+            </div>
+            <div class="tip-card">
+                <h4>📨 Resolver — Forwarding Rulesets</h4>
+                <p>Create <strong>DNS forwarding rulesets</strong> on the outbound endpoint to forward specific domains (e.g. <code>corp.local</code>) to on-premises DNS servers. Rulesets can be linked to multiple VNets — no need to configure DNS settings per VNet. Point Spoke VNets' DNS settings to the Resolver inbound endpoint IP.</p>
+                <a class="doc-link" href="https://learn.microsoft.com/en-us/azure/dns/private-resolver-endpoints-rulesets" target="_blank">📄 Docs: Endpoints and rulesets</a>
+            </div>
+            <div class="tip-card">
                 <h4>🏷️ Naming Convention</h4>
                 <p>Private DNS Zones for Private Endpoints follow the format <code>privatelink.{service}.{domain}</code>. Don't change the names — Azure expects them exactly.</p>
                 <a class="doc-link" href="https://learn.microsoft.com/en-us/azure/private-link/private-endpoint-dns" target="_blank">📄 Docs: Private Endpoint DNS configuration</a>
@@ -1338,6 +1560,55 @@
                 <code>privatelink.azurecr.io</code></p>
                 <a class="doc-link" href="https://learn.microsoft.com/en-us/azure/private-link/private-endpoint-dns#azure-services-dns-zone-configuration" target="_blank">📄 Docs: Full DNS zone list</a>
             </div>
+        </div>
+    </section>
+
+    <!-- ==================== OPS ==================== -->
+    <section class="section" id="ops">
+        <div class="section-header">
+            <span class="section-icon">🛠️</span>
+            <h2>Ops — Day-2 Network Operations</h2>
+            <span class="section-desc">Monitoring, alerting, troubleshooting, and governance baseline</span>
+        </div>
+
+        <div class="tips-grid">
+            <div class="tip-card">
+                <h4>📡 Centralize diagnostics</h4>
+                <p>Enable Diagnostic Settings on all critical network resources (Firewall, VPN/ER gateways, Application Gateway, Front Door, Bastion, DDoS) and send logs/metrics to Log Analytics.</p>
+                <a class="doc-link" href="https://learn.microsoft.com/en-us/azure/azure-monitor/essentials/diagnostic-settings" target="_blank">📄 Docs: Diagnostic settings</a>
+            </div>
+            <div class="tip-card">
+                <h4>🔍 Keep flow visibility</h4>
+                <p>Use <strong>Virtual Network Flow Logs</strong> for traffic visibility and investigation. Build workbooks for top talkers, denied flows, and unexpected east-west traffic paths.</p>
+                <a class="doc-link" href="https://learn.microsoft.com/en-us/azure/network-watcher/vnet-flow-logs-overview" target="_blank">📄 Docs: Virtual Network Flow Logs</a>
+            </div>
+            <div class="tip-card">
+                <h4>🚨 Build an alert baseline</h4>
+                <p>Create alerts for tunnel down events, gateway connection failures, firewall health degradation, App Gateway unhealthy backends, and DDoS mitigation activation.</p>
+                <a class="doc-link" href="https://learn.microsoft.com/en-us/azure/azure-monitor/alerts/alerts-overview" target="_blank">📄 Docs: Azure Monitor alerts</a>
+            </div>
+            <div class="tip-card">
+                <h4>🧪 Use Network Watcher tools</h4>
+                <p>Standardize troubleshooting with Effective Routes, Next Hop, IP Flow Verify, Connection Troubleshoot, and Packet Capture before escalating incidents.</p>
+                <a class="doc-link" href="https://learn.microsoft.com/en-us/azure/network-watcher/network-watcher-monitoring-overview" target="_blank">📄 Docs: Network Watcher tools</a>
+            </div>
+            <div class="tip-card">
+                <h4>🛡️ Govern with Azure Policy</h4>
+                <p>Use policy to enforce baseline controls (for example: approved regions/SKUs, mandatory diagnostic settings, restricted public exposure). Track compliance drift continuously.</p>
+                <a class="doc-link" href="https://learn.microsoft.com/en-us/azure/governance/policy/overview" target="_blank">📄 Docs: Azure Policy overview</a>
+            </div>
+            <div class="tip-card">
+                <h4>📘 Operate with runbooks</h4>
+                <p>Maintain runbooks for recurring scenarios: route leaks/asymmetry, DNS resolution failures, Private Endpoint outages, VPN/ER failover, and emergency egress controls.</p>
+                <a class="doc-link" href="https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/" target="_blank">📄 Docs: Operational Excellence</a>
+            </div>
+        </div>
+
+        <div class="callout callout-info">
+            <span class="callout-icon">💡</span>
+            <div><strong>Minimum operating baseline:</strong> central logging, actionable alerts, monthly route/security review, and tested incident runbooks. Without these, even a good architecture becomes hard to operate at scale.
+            <br><a class="doc" href="https://learn.microsoft.com/en-us/azure/network-watcher/network-watcher-monitoring-overview" target="_blank">📄 Docs: Network Watcher monitoring overview</a>
+            · <a class="doc" href="https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/observability" target="_blank">📄 Docs: Observability recommendations</a></div>
         </div>
     </section>
 
@@ -1473,11 +1744,16 @@
         </div>
     </section>
 
+
 </div>
 
 <footer class="footer">
     <p>Azure Network Cheatsheet — <a href="https://cloud63.fr" target="_blank">cloud63.fr</a></p>
     <p style="margin-top: 0.5rem;">Information provided as reference. Always check the <a href="https://learn.microsoft.com/en-us/azure/networking/" target="_blank">official Azure documentation</a> for up-to-date data.</p>
+    <p style="margin-top: 0.5rem; font-size: 0.75rem;">
+        <a href="https://github.com/vmisson" target="_blank">GitHub</a>
+        · <a href="https://www.linkedin.com/in/vmisson/" target="_blank">LinkedIn</a>
+    </p>
 </footer>
 
 <script>
