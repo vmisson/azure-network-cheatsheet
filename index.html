@@ -1307,7 +1307,7 @@
                         <td><span class="tag tag-no">✗</span> Random IP</td>
                         <td><span class="tag tag-no">Limited</span></td>
                         <td>Free</td>
-                        <td><strong>Depreciation: March 31, 2026.</strong> Do not rely on it</td>
+                        <td><strong>Deprecation: March 31, 2026.</strong> Do not rely on it</td>
                     </tr>
                 </tbody>
             </table>
@@ -1427,6 +1427,56 @@
             </table>
         </div>
 
+        <h3 style="margin: 1rem 0 0.8rem; font-size: 1.1rem;">Key Limits (v2 SKU)</h3>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Resource</th>
+                        <th>Limit</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Instances (autoscaling)</strong></td><td>125</td><td>Min 0, max 125. Set min ≥ 2 for production HA</td></tr>
+                    <tr><td><strong>HTTP Listeners</strong></td><td>200</td><td>100 active (routing traffic). WAF_v2: 40 active listeners</td></tr>
+                    <tr><td><strong>Routing Rules</strong></td><td>400</td><td>Request routing rules per gateway</td></tr>
+                    <tr><td><strong>Backend Pools</strong></td><td>100</td><td>Up to 1,200 backend targets per pool</td></tr>
+                    <tr><td><strong>Backend HTTP Settings</strong></td><td>100</td><td>One per listener/rule combination</td></tr>
+                    <tr><td><strong>Frontend Ports</strong></td><td>100</td><td>Per gateway</td></tr>
+                    <tr><td><strong>Frontend IP Configs</strong></td><td>4</td><td>1 public + 1 private (IPv4), 1 public + 1 private (IPv6)</td></tr>
+                    <tr><td><strong>SSL Certificates</strong></td><td>100</td><td>One per HTTPS listener</td></tr>
+                    <tr><td><strong>Rewrite Rule Sets</strong></td><td>400</td><td>Header and URL rewrite rule sets</td></tr>
+                    <tr><td><strong>URL Path Map rules</strong></td><td>100</td><td>Path-based rules per URL map</td></tr>
+                    <tr><td><strong>Max request size (WAF)</strong></td><td>4 GB</td><td>With WAF_v2 and CRS 3.2 or DRS rule sets</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3 style="margin: 1rem 0 0.8rem; font-size: 1.1rem;">Capacity per Instance (v2 SKU)</h3>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Metric</th>
+                        <th>Per Capacity Unit</th>
+                        <th>Per Instance (10 CU)</th>
+                        <th>Max (125 instances)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Persistent connections</strong></td><td>2,500</td><td>25,000</td><td>~3,125,000</td></tr>
+                    <tr><td><strong>Throughput</strong></td><td>2.22 Mbps</td><td>~22 Mbps</td><td>~2.75 Gbps</td></tr>
+                    <tr><td><strong>New connections/sec</strong></td><td>—</td><td>~500 (Std_v2) / ~100 (WAF_v2)</td><td>~62,500 / ~12,500</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div style="text-align: right; margin-top: -1rem; margin-bottom: 1rem;">
+            <a class="doc" href="https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/azure-subscription-service-limits#application-gateway-limits" target="_blank">📄 Docs: Application Gateway limits</a>
+            · <a class="doc" href="https://learn.microsoft.com/en-us/azure/application-gateway/high-traffic-support" target="_blank">📄 Docs: High traffic support</a>
+        </div>
+
         <div class="callout callout-info">
             <span class="callout-icon">💡</span>
             <div><strong>Application Gateway vs Azure Firewall:</strong> AppGW is a Layer 7 reverse proxy/load balancer (HTTP/HTTPS routing, WAF, SSL offload). Azure Firewall is a Layer 3-7 stateful firewall (egress filtering, DNAT, network rules). In a hub-spoke architecture, they are <strong>complementary</strong>: Firewall for egress control in the Hub, Application Gateway for ingress in each Spoke or in a shared DMZ Spoke.
@@ -1543,7 +1593,7 @@
             </div>
             <div class="tip-card">
                 <h4>⚠️ Auto-registration</h4>
-                <p>DNS auto-registration only works for VMs. Only one VNet can be linked with auto-registration per zone. Use it in the Shared Services Spoke for shared VMs.</p>
+                <p>DNS auto-registration only works for VMs. A VNet can only have auto-registration enabled for <strong>one</strong> Private DNS Zone (but a zone supports up to 100 VNets with auto-registration). Use it in the Shared Services Spoke for shared VMs.</p>
                 <a class="doc-link" href="https://learn.microsoft.com/en-us/azure/dns/private-dns-autoregistration" target="_blank">📄 Docs: Auto-registration feature</a>
             </div>
             <div class="tip-card">
